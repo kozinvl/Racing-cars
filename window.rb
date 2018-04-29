@@ -16,7 +16,8 @@ class Window < Gosu::Window
 
   def draw
     @track_image.draw(800, 0, 0, -1)
-    @image.draw_rot(@x, 300, 1, @angle)
+    @car_image.draw_rot(300, 650, 1, 115)
+    # @image.draw_rot(@x, 300, 1, @angle)
 
   end
 
@@ -35,22 +36,19 @@ class Window < Gosu::Window
 
   def button_down(id)
     if id == Gosu::KB_UP
-      @active = if @active
-                  false
-                else
-                  true
-                end
+      @active = @active ? false : true
     end
     if id == Gosu::KB_ESCAPE
       self.close
     end
   end
 
+
   def circle_moving(x_0, y_0, angle)
 
   end
 end
 
-wheel = Wheel.new
-wheel.show
-# wheel.draw
+window = Window.new
+window.show
+# window.draw
