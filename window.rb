@@ -7,7 +7,7 @@ class Window < Gosu::Window
     self.caption = "Racing game"
     @track_image = Gosu::Image.new('res/track.jpg')
     @car_image = Gosu::Image.new('res/car.png')
-    @image = Gosu::Image.new('res/image.png')
+    @pi = Math::PI
     @angle = 0
     @x = 320
     @y = 240
@@ -16,7 +16,7 @@ class Window < Gosu::Window
 
   def draw
     @track_image.draw(800, 0, 0, -1)
-    @car_image.draw_rot(300, 650, 1, 115)
+    @car_image.draw_rot(400+Math.sin(@angle*(@pi/180))*300, 400+Math.cos(@angle*(@pi/180))*300, 1, @angle)
     # @image.draw_rot(@x, 300, 1, @angle)
 
   end
@@ -44,8 +44,9 @@ class Window < Gosu::Window
   end
 
 
-  def circle_moving(x_0, y_0, angle)
-
+  def circle_moving(angle)
+    @x = Math.sin(angle*(Math.PI/180))*2
+    @y = Math.cos(angle*(Math.PI/180))*1
   end
 end
 
