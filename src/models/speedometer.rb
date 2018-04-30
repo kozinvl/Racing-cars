@@ -6,7 +6,7 @@ class Speedometer
     @speedometer = Gosu::Image.new(Path::IMAGES + 'speedometer.png')
     @speedometer_pointer =
       Gosu::Image.new(Path::IMAGES + 'speedometer-pointer.png')
-    @x = WIDTH - 80
+    @car_x = WIDTH - 80
     @y = HEIGHT - 80
   end
 
@@ -17,7 +17,7 @@ class Speedometer
   end
 
   def draw(player)
-    @speedometer.draw_rot(@x, @y, ZOrder::ELEMENT, 0.0)
-    @speedometer_pointer.draw_rot(@x, @y, ZOrder::ELEMENT, angle(player))
+    @speedometer.draw_rot(@car_x, @y, ZOrder::ELEMENT, 0.0)
+    @speedometer_pointer.draw_rot(@car_x, @y, ZOrder::ELEMENT, angle(player))
   end
 end

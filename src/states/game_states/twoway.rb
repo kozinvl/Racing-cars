@@ -57,14 +57,14 @@ class TwoWayGameState < GameState
   def handle_possible_collision_going(car, i)
     return unless @last_going_car
     @cars[i].speed = @last_going_car.speed if
-      @last_going_car.x == car.x &&
+      @last_going_car.x == car.car_x &&
       @last_going_car.y < car.y + @car_hit_distance
   end
 
   def handle_possible_collision_coming(car, i)
     return unless @last_coming_car
     @cars[i].speed = @last_coming_car.speed if
-      @last_coming_car.x == car.x &&
+      @last_coming_car.car_x == car.car_x &&
       @last_coming_car.y < car.y + @car_hit_distance
   end
 

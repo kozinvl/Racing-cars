@@ -11,7 +11,7 @@ class Player
   end
 
   def load_properties
-    @x = 0.0
+    @car_x = 0.0
     @y = 0.0
     @angle = 0.0
     @score = 0
@@ -22,14 +22,14 @@ class Player
   end
 
   def warp(x, y)
-    @x = x
+    @car_x = x
     @y = y
   end
 
   def accelerate
     @angle -= 1.0
     @x -= @speed * 1.25
-    @x = @margin_left if @x <= @margin_left
+    @car_x = @margin_left if @car_x <= @margin_left
     # if @speed > @speed_limit
     #   @speed = @speed_limit
     # else
@@ -51,19 +51,19 @@ class Player
 
   def move_left
     @angle = -5.0
-    @x -= @speed * 1.25
-    @x = @margin_left if @x <= @margin_left
+    @car_x -= @speed * 1.25
+    @car_x = @margin_left if @car_x <= @margin_left
   end
 
   def move_right
     @angle = 5.0
-    @x += @speed * 1.25
-    @x = @margin_right if @x >= @margin_right
+    @car_x += @speed * 1.25
+    @car_x = @margin_right if @car_x >= @margin_right
   end
 
   def collision?(cars)
     cars.each do |car|
-      if @x > car.x
+      if @car_x > car.car_x
         return true if left_collision?(car)
       elsif right_collision?(car)
         return true
@@ -73,17 +73,17 @@ class Player
   end
 
   def left_collision?(car)
-    return (@x - car.x < 50 && @y - car.y < 110) if @y > car.y
-    (@x - car.x < 50 && car.y - @y < 110)
+    return (@car_x - car.car_x < 50 && @y - car.y < 110) if @y > car.y
+    (@x - car.car_x < 50 && car.y - @y < 110)
   end
 
   def right_collision?(car)
-    return (car.x - @x < 50 && car.y - @y < 110) if car.y > @y
-    (car.x - @x < 50 && @y - car.y < 110)
+    return (car.car_x - @car_x < 50 && car.y - @y < 110) if car.y > @y
+    (car.car_x - @car_x < 50 && @y - car.y < 110)
   end
 
   def draw
     image = @animation[Gosu.milliseconds / 100 % @animation.size]
-    image.draw_rot(@x, @y, ZOrder::PLAYER, @angle)
+    image.draw_rot(@car_x, @y, ZOrder::PLAYER, @angle)
   end
 end

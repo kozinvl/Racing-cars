@@ -1,8 +1,8 @@
 require 'socket'
 require 'timeout'
-ChessServer = '192.168.2.1' # Заменить этот IP-адрес.
-ChessServerPort = 1200
-PeerPort = 12001
+ChessServer = 'localhost' # Заменить этот IP-адрес.
+ChessServerPort = 3000
+PeerPort = 3000
 WHITE, BLACK = 0, 1
 Colors = %w[White Black]
 

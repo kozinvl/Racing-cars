@@ -8,8 +8,8 @@ class Car
     @y = rand(100.0..170.0) * -1
     @initial_angle = angle
     @angle = @initial_angle
-    @x = options[:pos].sample
-    @stop_x = @x
+    @car_x = options[:pos].sample
+    @stop_x = @car_x
     @acceleration = [1.05, 0.95]
     load_properties(options[:player_speed])
     load_movements(options[:pos], options[:move])
@@ -29,7 +29,7 @@ class Car
 
   def load_movements(pos, move)
     return unless move
-    index = pos.index(@x)
+    index = pos.index(@car_x)
     @stop_x =
       if index.zero?
         pos[index + 1]
@@ -41,7 +41,7 @@ class Car
   end
 
   def warp(x, y)
-    @x = x
+    @car_x = x
     @y = y
   end
 
@@ -64,23 +64,23 @@ class Car
   def move
     @y += @speed
     lateral_move if @x != @stop_x && @y > 0
-    @angle = @initial_angle if @x == @stop_x
+    @angle = @initial_angle if @car_x == @stop_x
   end
 
   def lateral_move
-    if @stop_x > @x
+    if @stop_x > @car_x
       @angle = @initial_angle == 180 ? 175.0 : 5.0
-      @x += @speed * 0.25
-      @x = @stop_x if @stop_x < @x
+      @car_x += @speed * 0.25
+      @car_x = @stop_x if @stop_x < @car_x
     else
       @angle = @initial_angle == 180 ? 185.0 : -5.0
-      @x -= @speed * 0.25
-      @x = @stop_x if @stop_x > @x
+      @car_x -= @speed * 0.25
+      @car_x = @stop_x if @stop_x > @car_x
     end
   end
 
   def draw
     image = @animation[Gosu.milliseconds / 100 % @animation.size]
-    image.draw_rot(@x, @y, ZOrder::CARS, @angle)
+    image.draw_rot(@car_x, @y, ZOrder::CARS, @angle)
   end
 end

@@ -1,7 +1,7 @@
 require 'thread'
 require 'socket'
-PORT = 1200
-HOST = '192.168.2.1' # Заменить этот IP-адрес.
+PORT = 3000
+HOST = 'localhost' # Заменить этот IP-адрес.
 # Выход при нажатии клавиши Enter.
 waiter = Thread.new do
   puts 'Press enter for server closing'
@@ -55,7 +55,7 @@ def handle_client(sess, msg, addr, port, ipname)
 end
 
 text = nil
-$server = TCPSocket.new(HOST, PORT)
+$server = TCPServer.new(HOST, PORT)
 while (session = $server.accept) do
   Thread.new(session) do |sess|
     text = sess.gets

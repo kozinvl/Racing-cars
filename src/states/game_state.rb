@@ -100,16 +100,16 @@ class GameState < State
 
   def safe_to_add_new_car?(new_car)
     @cars.empty? || (
-    new_car.x != @cars[-1].x &&
-        new_car.stop_x != @cars[-1].x &&
-        new_car.x != @cars[-1].stop_x
+    new_car.car_x != @cars[-1].car_x &&
+        new_car.stop_x != @cars[-1].car_x &&
+        new_car.car_x != @cars[-1].stop_x
     )
   end
 
   def add_new_car
     new_car = next_car
     if safe_to_add_new_car?(new_car)
-      new_car.stop_x = new_car.x if !@cars.empty? && new_car.stop_x == @cars[-1].stop_x
+      new_car.stop_x = new_car.car_x if !@cars.empty? && new_car.stop_x == @cars[-1].stop_x
       @cars << new_car
       @current_wave += 1
     end
