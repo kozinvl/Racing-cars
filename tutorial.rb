@@ -45,7 +45,16 @@ class Player
   end
 
   def draw
-    @image.draw_rot(@x, @y, ZOrder::PLAYER, @angle)
+    # Flip vertically when facing to the left.
+    if @dir == :left
+      offs_x = -25
+      factor = 1.0
+    else
+      offs_x = 25
+      factor = -1.0
+    end
+    @image.draw_rot(@x , @y - 49, ZOrder::PLAYER, @angle, 1.0)
+    # @image.draw_rot(@x, @y, ZOrder::PLAYER, @angle)
   end
 
   def collect_stars(stars)
