@@ -3,27 +3,27 @@ require "socket"
 
 class Client
 
-  PORT = 12000
+  PORT = 3000
   HOST = "localhost"
 
   def initialize
-    @socket = TCPSocket.new(HOST, PORT)
-    self.setup_networking
+    @socket = TCPSocket.open(HOST, PORT)
   end
 
   def setup_networking
-    loop do
-      input_line = @socket.gets #getting message from client
-      puts input_line
-      socket.close
+    x = true
+    while x
+      puts @socket.gets #getting message from client
+      puts @socket.gets 
+      @socket.puts(Time.now)
     end
-
+    @socket.close
   end
-
 end
 
 
 client = Client.new
+client.setup_networking
 
 
 
