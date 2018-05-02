@@ -50,6 +50,7 @@ class Tree
 
   def draw
     # Draw, slowly rotating
+    # @image.draw_rot(@x, @y, 0, 25 * Math.sin(Gosu.milliseconds / 133.7))
     @image.draw(@x, @y, 0)
   end
 end
@@ -138,21 +139,21 @@ class Map
     gem_img = Gosu::Image.new('media/tree.png')
     @gems = []
 
-    lines = File.readlines(filename).map { |line| line.chomp }
+    lines = File.readlines(filename).map {|line| line.chomp}
     @height = lines.size
     @width = lines[0].size
     @tiles = Array.new(@width) do |x|
       Array.new(@height) do |y|
         case lines[y][x, 1]
-          when '"'
-            Tiles::Grass
-          when '#'
-            Tiles::Earth
-          when 'x'
-            @gems.push(Tree.new(gem_img, x * 50 + 25, y * 50 + 25))
-            nil
-          else
-            nil
+        when '"'
+          Tiles::Grass
+        when '#'
+          Tiles::Earth
+        when 'x'
+          @gems.push(Tree.new(gem_img, x * 50 + 25, y * 50 + 25))
+          nil
+        else
+          nil
         end
       end
     end
@@ -171,7 +172,7 @@ class Map
         end
       end
     end
-    @gems.each { |c| c.draw }
+    @gems.each {|c| c.draw}
   end
 
   # Solid at a given pixel position?
@@ -180,24 +181,35 @@ class Map
   end
 end
 
-class CptnRuby < (Example rescue Gosu::Window)
+class Racing < (Example rescue Gosu::Window)
   def initialize
     super WIDTH, HEIGHT
 
     self.caption = "Cptn. Ruby"
 
-    @sky = Gosu::Image.new("res/track.jpg", :tileable => true)
+    @track = Gosu::Image.new("res/track.jpg", :tileable => true)
     @map = Map.new("media/cptn_ruby_map.txt")
-    @player = Player.new(@map, 400, 650)
+    @player_a = Player.new(@map, 400, 650)
+    @player_b = Player.new(@map, 400, 750)
     # The scrolling position is stored as top left corner of the screen.
-    @camera_x = @camera_y = 0
+    @font = Gosu::Font.new(20)
+  end
+
+  def needs_cursor?
+    true
   end
 
   def update
-    @player.move
-    @player.turn_left if Gosu.button_down? Gosu::KB_LEFT and @player.condition
-    @player.turn_right if Gosu.button_down? Gosu::KB_RIGHT and @player.condition
-    @player.accelerate if Gosu.button_down? Gosu::KB_UP and @player.condition
+    @player_b.move
+    @player_b.turn_left if Gosu.button_down? Gosu::KB_A and @player_b.condition
+    @player_b.turn_right if Gosu.button_down? Gosu::KB_D and @player_b.condition
+    @player_b.accelerate if Gosu.button_down? Gosu::KB_W and @player_b.condition
+    @player_b.collect_gems(@map.gems)
+
+    @player_a.move
+    @player_a.turn_left if Gosu.button_down? Gosu::KB_LEFT and @player_a.condition
+    @player_a.turn_right if Gosu.button_down? Gosu::KB_RIGHT and @player_a.condition
+    @player_a.accelerate if Gosu.button_down? Gosu::KB_UP and @player_a.condition
 
 
     # move_x = 0
@@ -207,17 +219,20 @@ class CptnRuby < (Example rescue Gosu::Window)
     # move_y -= 5 if Gosu.button_down? Gosu::KB_UP
     # move_y += 5 if Gosu.button_down? Gosu::KB_DOWN
     # @player.update(move_x, move_y)
-    @player.collect_gems(@map.gems)
+    @player_a.collect_gems(@map.gems)
+
     # Scrolling follows player
-    @camera_x = [[@player.x - WIDTH / 2, 0].max, @map.width * 50 - WIDTH].min
-    @camera_y = [[@player.y - HEIGHT / 2, 0].max, @map.height * 50 - HEIGHT].min
+    @camera_x = [[@player_a.x - WIDTH / 2, 0].max, @map.width * 50 - WIDTH].min
+    @camera_y = [[@player_a.y - HEIGHT / 2, 0].max, @map.height * 50 - HEIGHT].min
   end
 
   def draw
-    @sky.draw 0, 0, 0
+    @track.draw 0, 0, 0
     # Gosu.translate(-@camera_x, -@camera_y) do
-      @map.draw
-      @player.draw
+    @map.draw
+    @player_a.draw
+    @player_b.draw
+    # @font.draw("Score: #{@player.score}", 10, 10, ZOrder::UI, 1.0, 1.0, Gosu::Color::YELLOW)
     # end
   end
 
@@ -225,13 +240,13 @@ class CptnRuby < (Example rescue Gosu::Window)
     case id
       # when Gosu::KB_UP
       #   @cptn.try_to_jump
-      when Gosu::KB_ESCAPE
-        close
-      else
-        super
+    when Gosu::KB_ESCAPE
+      close
+    else
+      super
     end
   end
 
 end
 
-CptnRuby.new.show if __FILE__ == $0
+Racing.new.show if __FILE__ == $0

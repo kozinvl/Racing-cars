@@ -4,7 +4,7 @@ require "socket"
 class Client
 
   PORT = 3000
-  HOST = "localhost"
+  HOST = "10.129.201.49"
 
   def initialize
     @socket = TCPSocket.open(HOST, PORT)
