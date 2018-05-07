@@ -4,7 +4,7 @@ $winW = 800
 $winH = 800
 
 class Player
-  attr_accessor :clientSocket, :player_id, :x, :y, :life
+  attr_accessor :clientSocket, :player_id, :x, :y, :angle
 
   def initialize(client, id)
     @clientSocket = client
@@ -25,8 +25,8 @@ class Player
       elsif id == 1
         @x = info[1].to_f
         @y = info[2].to_f
-        @life = info[3].to_f
-        players_list[1 - @player_id].clientSocket.puts "1,#{@x},#{@y},#{@life}"
+        @angle = info[3].to_f
+        players_list[1 - @player_id].clientSocket.puts "1,#{@x},#{@y},#{@angle}"
       elsif id == 2
         x = info[1].to_f
         y = info[2].to_f
@@ -54,8 +54,9 @@ loop do
       #puts info
       #puts "player #{num_players} adicionado"
       player.listen($players)
-      elseв.puts 'error SalaCheia'
-      clцnt.close
+    else
+      puts 'error SalaCheia'
+      client.close
     end
   end
 end

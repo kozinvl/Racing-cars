@@ -1,20 +1,17 @@
 require_relative 'position'
 
-$winW, $winH = 600, 400
+$winW, $winH = 800, 800
 $rop = 20
 
 class Player
-  attr_accessor :pos, :vel, :life, :dmg, :regen_rate
+  attr_accessor :pos, :vel, :angle
   attr_reader :l
 
   def initialize
     @pos = Position.zero
     @vel = Position.zero
-    @life = 100.0
-    @dmg = 4.3
-    @regen_rate = 0.01
     @l = $rop
-    @color = 0xff_00ff00
+    @angle = 90.0
     @buttons = {Gosu::KbA => false, Gosu::KbD => false, Gosu::KbW => false, Gosu::KbS => false}
     @image = Gosu::Image.new('res/car_b.png')
   end
@@ -33,17 +30,18 @@ class Player
   end
 =end
   def draw
-    @image.draw_rot(@pos.x, @pos.y, 1, 90)
+    @image.draw_rot(@pos.x, @pos.y, 1, @angle)
   end
 
   def update
     @pos = Position.add(@pos, @vel)
     @pos.x = [[@pos.x, $winW - 1].min, 0].max
     @pos.y = [[@pos.y, $winH - 1].min, 0].max
-    @life = [@life + @regen_rate, 100.0].min
+    # @life = [@life + @regen_rate, 100.0].min
     check_presseds
   end
 
+=begin
   def check_presseds()
     a = 0.35
     v_lim = 1.8
@@ -63,6 +61,25 @@ class Player
     @vel.x = [@vel.x, -v_lim].max
     @vel.y = [@vel.y, v_lim].min
     @vel.y = [@vel.y, -v_lim].max
+  end
+=end
+
+  def check_presseds()
+    if @buttons[Gosu::KbA]
+      @angle -= 4.5
+    end
+    if @buttons[Gosu::KbD]
+      @angle += 4.5
+    end
+    if @buttons[Gosu::KbW]
+      @vel.x += Gosu.offset_x(@angle, 0.5)
+      @vel.y += Gosu.offset_y(@angle, 0.5)
+      @vel.x *= 0.9
+      @vel.y *= 0.9
+    end
+    # if @buttons[Gosu::KbS]
+    #   @vel.y += a
+    # end
   end
 
   def button_down(id)

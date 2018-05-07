@@ -9,7 +9,7 @@ $winW, $winH = 800, 800
 $rop = 20
 
 class TankDuel < Gosu::Window
-  attr_accessor :listenThread, :serverSocket, :id, :player, :enemy, :blocks, :running, :font
+  attr_accessor :listenThread, :serverSocket, :id, :player, :enemy, :running, :font
 
   def initialize(width, height)
     super(width, height, false)
@@ -20,6 +20,7 @@ class TankDuel < Gosu::Window
     @blocks = []
     @mousep = mousepos
     @running = true
+    @finish = false
     @font = Gosu::Font.new(self, "Arial", 24)
   end
 
@@ -39,16 +40,16 @@ class TankDuel < Gosu::Window
 
   def listen
     while info = @serverSocket.gets.chomp.split(",")
-      obj_type = info[0].to_i
-      if obj_type == 1
-        x, y, life = info[1..3].map(&:to_f)
+      # obj_type = info[0].to_i
+      # if obj_type == 1
+        x, y, angle = info[1..3].map(&:to_f)
         @enemy.setP Position.new(x, y)
-        @enemy.life = life
-      elsif obj_type == 2
-        x, y, vx, vy = info[1..4].map(&:to_f)
-        # block = Block.new Position.new(x, y), Position.new(vx, vy), true # <<<< from_enemy
-        # @blocks << block
-      end
+        @enemy.set_angle(angle)
+      # elsif obj_type == 2
+      #   x, y, vx, vy = info[1..4].map(&:to_f)
+      #   # block = Block.new Position.new(x, y), Position.new(vx, vy), true # <<<< from_enemy
+      #   # @blocks << block
+      # end
 
     end
   end
@@ -76,12 +77,12 @@ class TankDuel < Gosu::Window
     # end
   end
 
-  def draw_rect(xo, yo, xf, yf, c = 0xffffffff, z = 0)
-    draw_quad(xo, yo, c, xf, yo, c, xf, yf, c, xo, yf, c, z)
-  end
+  # def draw_rect(xo, yo, xf, yf, c = 0xffffffff, z = 0)
+  #   draw_quad(xo, yo, c, xf, yo, c, xf, yf, c, xo, yf, c, z)
+  # end
 
   def update
-    if (@player.life <= 0 or @enemy.life <= 0) and @running
+    if @finish and @running
       @running = false
       @serverSocket.puts "0"
     end
@@ -108,7 +109,7 @@ class TankDuel < Gosu::Window
   end
 
   def sendMe
-    @serverSocket.puts "1,#{@player.pos.x},#{@player.pos.y},#{@player.life}"
+    @serverSocket.puts "1,#{@player.pos.x},#{@player.pos.y},#{@player.angle}"
   end
 
   # def sendBlock(block)
@@ -125,11 +126,8 @@ class TankDuel < Gosu::Window
   # end
 
   def button_down(id)
-    if (id == Gosu::MsLeft and @running)
-      # shoot
-    end
     if (id == Gosu::KbQ)
-      @player.life = 0
+      @player.angle = 92
       @running = false
       @serverSocket.puts "0"
       close!
