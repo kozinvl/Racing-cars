@@ -3,18 +3,17 @@
   attr_accessor :x, :y
 
   def initialize(x, y, bool = false)
-    @x, @y = x, y
-    if (bool)
-      puts to_s
-    end
+    @x = x
+    @y = y
+    puts to_s if bool
     @@count += 1
   end
 
   def to_s
-    "x: #@x, y: #@y"
+    "x: #{@x}, y: #{@y}"
   end
 
-  def self.zero()
+  def self.zero
     Position.new(0.0, 0.0)
   end
 
@@ -36,7 +35,7 @@
   end
 
   def self.modulo(pos)
-    Math.sqrt(pos.x ** 2 + pos.y ** 2)
+    Math.sqrt(pos.x**2 + pos.y**2)
   end
 
   def self.prodInterno(a, b)
@@ -57,7 +56,7 @@
 
   def self.le(texto)
     print texto
-    gets()
+    gets
   end
 
   def self.leArrayInt(texto)
@@ -67,13 +66,11 @@
   private_class_method :leArrayInt
 
   def self.crFromUser
-    puts @@count.to_s + "ª " + name
+    puts @@count.to_s + 'ª ' + name
     begin
-      posArray = leArrayInt("Digite x e y: ")
+      posArray = leArrayInt('Enter x & y: ')
       bool = posArray.size != 2
-      if bool
-        puts "Entrada errada, digite novamente"
-      end
+      puts 'Wrong entry, re-enter please' if bool
     end while bool
     Position.new(posArray[0], posArray[1], true)
   end

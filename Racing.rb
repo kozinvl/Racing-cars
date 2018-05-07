@@ -5,52 +5,54 @@ require_relative 'position'
 require_relative 'player'
 require_relative 'passive_objects'
 
-$winW, $winH = 800, 800
+$winW = 800
+$winH = 800
 $rop = 20
 
-class TankDuel < Gosu::Window
+class Racers < Gosu::Window
   attr_accessor :listenThread, :serverSocket, :id, :player, :enemy, :running, :font
 
   def initialize(width, height)
     super(width, height, false)
-    self.caption = "TankDuel"
-    @track = Gosu::Image.new('res/track.jpg', :tileable => true)
-    @player = Player.new()
-    @enemy = Enemy.new()
+    self.caption = 'TankDuel'
+    @track = Gosu::Image.new('res/track.jpg', tileable: true)
+    @player = Player.new
+    @enemy = Enemy.new
     @blocks = []
-    @mousep = mousepos
     @running = true
     @finish = false
-    @font = Gosu::Font.new(self, "Arial", 24)
+    @font = Gosu::Font.new(self, 'Arial', 24)
   end
 
-  def self.create(width, height, serverSocket, player_data)
-    game = TankDuel.new($winW, $winH);
-    game.listenThread = Thread.fork {game.listen()}
+  def needs_cursor?
+    true
+  end
+
+  def self.create(_width, _height, serverSocket, player_data)
+    game = Racers.new($window_width, $window_heigth)
+    game.listenThread = Thread.fork do
+      begin
+        game.listen
+      rescue IOError
+      end
+    end
+
     game.serverSocket = serverSocket
-    game.id, x, y = player_data.split(',').map {|e| e.to_f}
+    game.id, x, y = player_data.split(',').map(&:to_f)
     game.id = game.id.to_i
 
     game.player.setP Position.new(x, y)
     game.player.setV Position.new(0.0, 0.0)
     game.enemy.setP Position.new(-1000, -1000)
 
-    return game
+    game
   end
 
   def listen
-    while info = @serverSocket.gets.chomp.split(",")
-      # obj_type = info[0].to_i
-      # if obj_type == 1
-        x, y, angle = info[1..3].map(&:to_f)
-        @enemy.setP Position.new(x, y)
-        @enemy.set_angle(angle)
-      # elsif obj_type == 2
-      #   x, y, vx, vy = info[1..4].map(&:to_f)
-      #   # block = Block.new Position.new(x, y), Position.new(vx, vy), true # <<<< from_enemy
-      #   # @blocks << block
-      # end
-
+    while (info = @serverSocket.gets.chomp.split(','))
+      x, y, angle = info[1..3].map(&:to_f)
+      @enemy.setP Position.new(x, y)
+      @enemy.set_angle(angle)
     end
   end
 
@@ -82,9 +84,9 @@ class TankDuel < Gosu::Window
   # end
 
   def update
-    if @finish and @running
+    if @finish && @running
       @running = false
-      @serverSocket.puts "0"
+      @serverSocket.puts '0'
     end
     @player.update if running
     # if (!@blocks.nil?)
@@ -105,7 +107,6 @@ class TankDuel < Gosu::Window
     #   @blocks.select! {|b| !b.for_delete}
     # end
     sendMe
-    @mousep = mousepos
   end
 
   def sendMe
@@ -126,17 +127,15 @@ class TankDuel < Gosu::Window
   # end
 
   def button_down(id)
-    if (id == Gosu::KbQ)
+    case id
+    when
+    Gosu::KbQ
       @player.angle = 92
       @running = false
-      @serverSocket.puts "0"
+      @serverSocket.puts '0'
       close!
     end
     @player.button_down(id)
-  end
-
-  def mousepos
-    return Position.new(mouse_x.to_f, mouse_y.to_f)
   end
 
   def button_up(id)
@@ -147,15 +146,15 @@ class TankDuel < Gosu::Window
     !@running
   end
 end
-print "Endereco Ip = "
+print "Enter IP adress \n"
 ip = gets.chomp
 
-serverSocket = TCPSocket.new (ip.length < 7) ? ('10.129.201.101') : (ip), 2000
+server_socket = TCPSocket.new ip.length < 7 ? '10.129.201.101' : ip, 2000
 
-info = serverSocket.gets
-flag, player_data = info.split(" ")
-if (!flag.eql?("error"))
-  game = TankDuel.create($winW, $winH, serverSocket, player_data)
-  game.show()
+info = server_socket.gets
+flag, player_data = info.split(' ')
+unless flag.eql?('error')
+  game = Racers.create($window_width, $window_heigth, server_socket, player_data)
+  game.show
 end
-serverSocket.close
+server_socket.close
