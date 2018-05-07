@@ -1,32 +1,3 @@
-# Encoding: UTF-8
-
-# Basically, the tutorial game taken to a jump'n'run perspective.
-
-# Shows how to
-#  * implement jumping/gravity
-#  * implement scrolling using Window#translate
-#  * implement a simple tile-based map
-#  * load levels from primitive text files
-
-# Some exercises, starting at the real basics:
-#  0) understand the existing code!
-# As shown in the tutorial:
-#  1) change it use Gosu's Z-ordering
-#  2) add gamepad support
-#  3) add a score as in the tutorial game
-#  4) similarly, add sound effects for various events
-# Exploring this game's code and Gosu:
-#  5) make the player wider, so he doesn't fall off edges as easily
-#  6) add background music (check if playing in Window#update to implement
-#     looping)
-#  7) implement parallax scrolling for the star background!
-# Getting tricky:
-#  8) optimize Map#draw so only tiles on screen are drawn (needs modulo, a pen
-#     and paper to figure out)
-#  9) add loading of next level when all gems are collected
-# ...Enemies, a more sophisticated object system, weapons, title and credits
-# screens...
-
 require 'rubygems'
 require 'gosu'
 
@@ -103,7 +74,7 @@ class Player
   end
 
   def condition
-    if (20...780).include?(@x) and (0...800).include?(@y)
+    if (20...780).cover?(@x) and (0...800).cover?(@y)
       true
     end
   end
@@ -134,7 +105,7 @@ class Map
 
   def initialize(filename)
     # Load 60x60 tiles, 5px overlap in all four directions.
-    @tileset = Gosu::Image.load_tiles("media/tileset.png", 80, 80, :tileable => true)
+    @tileset = Gosu::Image.load_tiles('media/tileset.png', 80, 80, :tileable => true)
 
     gem_img = Gosu::Image.new('media/tree.png')
     @gems = []
@@ -185,10 +156,10 @@ class Racing < (Example rescue Gosu::Window)
   def initialize
     super WIDTH, HEIGHT
 
-    self.caption = "Cptn. Ruby"
+    self.caption = 'Cptn. Ruby'
 
-    @track = Gosu::Image.new("res/track.jpg", :tileable => true)
-    @map = Map.new("media/cptn_ruby_map.txt")
+    @track = Gosu::Image.new('res/track.jpg', :tileable => true)
+    @map = Map.new('media/cptn_ruby_map.txt')
     @player_a = Player.new(@map, 400, 650)
     @player_b = Player.new(@map, 400, 750)
     # The scrolling position is stored as top left corner of the screen.
@@ -212,6 +183,7 @@ class Racing < (Example rescue Gosu::Window)
     @player_a.accelerate if Gosu.button_down? Gosu::KB_UP and @player_a.condition
 
 
+
     # move_x = 0
     # move_x -= 5 if Gosu.button_down? Gosu::KB_LEFT
     # move_x += 5 if Gosu.button_down? Gosu::KB_RIGHT
@@ -221,9 +193,6 @@ class Racing < (Example rescue Gosu::Window)
     # @player.update(move_x, move_y)
     @player_a.collect_gems(@map.gems)
 
-    # Scrolling follows player
-    @camera_x = [[@player_a.x - WIDTH / 2, 0].max, @map.width * 50 - WIDTH].min
-    @camera_y = [[@player_a.y - HEIGHT / 2, 0].max, @map.height * 50 - HEIGHT].min
   end
 
   def draw
