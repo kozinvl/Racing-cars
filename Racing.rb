@@ -14,7 +14,7 @@ class Racers < Gosu::Window
 
   def initialize(width, height)
     super(width, height, false)
-    self.caption = 'TankDuel'
+    self.caption = 'Racing'
     @track = Gosu::Image.new('res/track.jpg', tileable: true)
     @player = Player.new
     @enemy = Enemy.new
@@ -44,7 +44,6 @@ class Racers < Gosu::Window
     game.player.setP Position.new(x, y)
     game.player.setV Position.new(0.0, 0.0)
     game.enemy.setP Position.new(-1000, -1000)
-
     game
   end
 

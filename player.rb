@@ -11,7 +11,6 @@ class Player
   def initialize
     @pos = Position.zero
     @vel = Position.zero
-    # @l = $rop
     @angle = 90.0
     @buttons = {Gosu::KbA => false, Gosu::KbD => false, Gosu::KbW => false, Gosu::KbS => false}
     @image = Gosu::Image.new('res/car_b.png')
@@ -33,7 +32,6 @@ class Player
     @pos = Position.add(@pos, @vel)
     @pos.x = [[@pos.x, $window_width - 1].min, 0].max
     @pos.y = [[@pos.y, $window_heigth - 1].min, 0].max
-    # @life = [@life + @regen_rate, 100.0].min
     check_presseds
   end
 
@@ -49,6 +47,11 @@ class Player
       @vel.y += Gosu.offset_y(@angle, 0.5)
       @vel.x *= 0.9
       @vel.y *= 0.9
+    end
+    if @buttons[Gosu::KbS]
+      @vel.x = 0.0
+      @vel.y = 0.0
+
     end
   end
 

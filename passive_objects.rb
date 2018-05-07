@@ -12,7 +12,6 @@ class Enemy
   def initialize
     @pos = Position.zero
     @l = $rop
-    # @color = 0xff_ff0000
     @image = Gosu::Image.new('res/car.png')
     @angle = 0.0
   end
