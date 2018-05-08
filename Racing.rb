@@ -5,7 +5,6 @@ require_relative 'position'
 require_relative 'player'
 require_relative 'passive_objects'
 
-
 $rop = 20
 
 class Racers < Gosu::Window
@@ -15,16 +14,55 @@ class Racers < Gosu::Window
     super(width, height, false)
     self.caption = 'Racing'
     @track = Gosu::Image.new('res/track.jpg', tileable: true)
+    @shade_image = Gosu::Image.new('res/shade.png', tileable: true)
     @player = Player.new
     @enemy = Enemy.new
     @blocks = []
-    @running = true
+    @running = false
     @finish = false
     @font = Gosu::Font.new(self, 'Arial', 24)
+    @loading = true
+    @countdown = ["3", "2", "1", "GO!"]
+    @initial_millis = 0
+    @paused = false
+    @loading_index = 0
+    load_loading_properties
   end
 
   def needs_cursor?
     true
+  end
+
+  def load_loading_properties
+    @loading_font = Gosu::Image.from_text(
+        @countdown[@loading_index], 90, font: 'res/Play.ttf'
+    )
+  end
+
+  def draw_when_loading
+    return unless @loading
+    @shade_image.draw(0, 0, 4)
+    @loading_font.draw_rot($window_width / 2, $window_heigth / 2, 5, 0.0)
+    if @loading_index < @countdown.size
+      handle_countdown unless @paused
+    else
+      @initial_millis = Gosu.milliseconds
+      @loading = false
+      @running = true
+    end
+  end
+
+  def handle_countdown
+    return unless millis / 1000 > 0
+    @loading_index += 1
+    @initial_millis = Gosu.milliseconds
+    @loading_font = Gosu::Image.from_text(
+        @countdown[@loading_index], 90, font: 'res/Play.ttf'
+    )
+  end
+
+  def millis
+    Gosu.milliseconds - @initial_millis
   end
 
   def self.create(_width, _height, serverSocket, player_data)
@@ -58,6 +96,7 @@ class Racers < Gosu::Window
     @track.draw 0, 0, 0
     @player.draw
     @enemy.draw
+    draw_when_loading
   end
 
   def update
@@ -66,10 +105,10 @@ class Racers < Gosu::Window
       @serverSocket.puts '0'
     end
     @player.update if running
-    sendMe
+    send_me
   end
 
-  def sendMe
+  def send_me
     @serverSocket.puts "1,#{@player.pos.x},#{@player.pos.y},#{@player.angle}"
   end
 
@@ -77,7 +116,7 @@ class Racers < Gosu::Window
     case id
     when
     Gosu::KbQ
-      @player.angle = 92
+      @player.angle = 90
       @running = false
       @serverSocket.puts '0'
       close!
