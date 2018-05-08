@@ -57,5 +57,6 @@ loop do
       end
     end
   rescue Interrupt
+    puts 'Connection closed'
   end
 end
