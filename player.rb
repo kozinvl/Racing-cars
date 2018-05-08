@@ -9,11 +9,14 @@ class Player
   attr_reader :l
 
   def initialize
+    @centre_pos = Position.new(400, 400)
     @pos = Position.zero
     @vel = Position.zero
     @angle = 90.0
-    @buttons = {Gosu::KbA => false, Gosu::KbD => false, Gosu::KbW => false, Gosu::KbS => false}
+    @buttons = { Gosu::KbA => false, Gosu::KbD => false,
+                 Gosu::KbW => false, Gosu::KbS => false }
     @image = Gosu::Image.new('res/car_b.png')
+    @radius = 80
   end
 
   def setP(pos)
@@ -32,16 +35,21 @@ class Player
     @pos = Position.add(@pos, @vel)
     @pos.x = [[@pos.x, $window_width - 1].min, 0].max
     @pos.y = [[@pos.y, $window_heigth - 1].min, 0].max
+    if collide?(@pos)
+      @vel.x = 0
+      @vel.y = 0
+    end
     check_presseds
   end
 
-  def check_presseds()
-    if @buttons[Gosu::KbA]
-      @angle -= 4.5
-    end
-    if @buttons[Gosu::KbD]
-      @angle += 4.5
-    end
+  def collide?(thing)
+    dist = Gosu.distance(@centre_pos.x, @centre_pos.y, thing.x, thing.y)
+    dist < 200
+  end
+
+  def check_presseds
+    @angle -= 4.5 if @buttons[Gosu::KbA]
+    @angle += 4.5 if @buttons[Gosu::KbD]
     if @buttons[Gosu::KbW]
       @vel.x += Gosu.offset_x(@angle, 0.5)
       @vel.y += Gosu.offset_y(@angle, 0.5)
