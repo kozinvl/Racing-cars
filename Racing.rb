@@ -22,11 +22,12 @@ class Racers < Gosu::Window
     @finish = false
     @font = Gosu::Font.new(self, 'Arial', 24)
     @loading = true
-    @countdown = ["3", "2", "1", "GO!"]
+    @countdown = ['3', '2', '1', 'GO!']
     @initial_millis = 0
     @paused = false
     @loading_index = 0
     load_loading_properties
+    @timer = 0.0
   end
 
   def needs_cursor?
@@ -65,7 +66,7 @@ class Racers < Gosu::Window
     Gosu.milliseconds - @initial_millis
   end
 
-  def self.create(_width, _height, serverSocket, player_data)
+  def self.create(_width, _height, server_socket, player_data)
     game = Racers.new($window_width, $window_heigth)
     game.listenThread = Thread.fork do
       begin
@@ -74,10 +75,9 @@ class Racers < Gosu::Window
       end
     end
 
-    game.serverSocket = serverSocket
+    game.serverSocket = server_socket
     game.id, x, y = player_data.split(',').map(&:to_f)
     game.id = game.id.to_i
-
     game.player.setP Position.new(x, y)
     game.player.setV Position.new(0.0, 0.0)
     game.enemy.setP Position.new(-1000, -1000)
@@ -89,14 +89,20 @@ class Racers < Gosu::Window
       x, y, angle = info[1..3].map(&:to_f)
       @enemy.setP Position.new(x, y)
       @enemy.set_angle(angle)
+      @timer += 1
     end
   end
 
   def draw
-    @track.draw 0, 0, 0
-    @player.draw
-    @enemy.draw
-    draw_when_loading
+    case @timer
+    when 0..5
+      @track.draw 0, 0, 0
+    else
+      @track.draw 0, 0, 0
+      @player.draw
+      @enemy.draw
+      draw_when_loading
+    end
   end
 
   def update
@@ -132,6 +138,7 @@ class Racers < Gosu::Window
     !@running
   end
 end
+
 print "Enter IP adress \n"
 ip = gets.chomp
 

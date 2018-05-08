@@ -16,11 +16,7 @@ class Client
   def listen(players_list)
     loop do
       next unless players_list.size == 2
-      begin
-        info = @client_socket.gets.chomp.split(',')
-      rescue NilClass
-        puts 'Client is disconnected'
-      end
+      info = @client_socket.gets.chomp.split(',')
       id = info[0].to_i
       if (id == 0) && !$players.empty?
         $players = []
@@ -29,12 +25,12 @@ class Client
         @y = info[2].to_f
         @angle = info[3].to_f
         players_list[1 - @player_id].client_socket.puts "1,#{@x},#{@y},#{@angle}"
-      elsif id == 2
-        x = info[1].to_f
-        y = info[2].to_f
-        vx = info[3].to_f
-        vy = info[4].to_f
-        players_list[1 - @player_id].client_socket.puts "2,#{x},#{y},#{vx},#{vy}"
+        # elsif id == 2
+        #   x = info[1].to_f
+        #   y = info[2].to_f
+        #   vx = info[3].to_f
+        #   vy = info[4].to_f
+        #   players_list[1 - @player_id].client_socket.puts "2,#{x},#{y},#{vx},#{vy}"
       end
     end
     @client_socket.close
@@ -54,8 +50,9 @@ loop do
         info = "connected #{player.player_id},#{player.x},#{player.y}"
         player.client_socket.puts info
         player.listen($players)
+        puts $players
       else
-        puts 'error Full Number'
+        puts 'error full number of players'
         client.close
       end
     end
