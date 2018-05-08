@@ -5,7 +5,6 @@ require_relative 'position'
 require_relative 'player'
 require_relative 'passive_objects'
 
-$rop = 20
 
 class Racers < Gosu::Window
   attr_accessor :listenThread, :serverSocket, :id, :player, :enemy, :running, :font
@@ -72,6 +71,7 @@ class Racers < Gosu::Window
       begin
         game.listen
       rescue IOError
+        puts 'connection closed'
       end
     end
 
@@ -139,7 +139,7 @@ class Racers < Gosu::Window
   end
 end
 
-print "Enter IP adress \n"
+print "Enter IP:  \n"
 ip = gets.chomp
 
 server_socket = TCPSocket.new ip.length < 7 ? '10.129.201.101' : ip, 2000
