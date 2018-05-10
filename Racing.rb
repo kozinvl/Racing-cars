@@ -7,12 +7,12 @@ require_relative 'passive_objects'
 
 
 class Racers < Gosu::Window
-  attr_accessor :listenThread, :serverSocket, :id, :player, :enemy, :running, :font
+  attr_accessor :listenThread, :serverSocket, :id, :player, :enemy, :running
 
   def initialize(width, height)
     super(width, height, false)
     self.caption = 'Racing'
-    @centre_pos = Position.new(400, 400)
+    @centre_pos = Position.new($window_width / 2, $window_heigth / 2)
     @track = Gosu::Image.new('res/track.jpg', tileable: true)
     @loading_screen = Gosu::Image.new('res/loading_screen.jpg', tileable: true)
     @shade_image = Gosu::Image.new('res/shade.png', tileable: true)
@@ -24,11 +24,10 @@ class Racers < Gosu::Window
     @font = Gosu::Font.new(self, 'Arial', 24)
     @loading = true
     @countdown = ['3', '2', '1', 'GO!']
-    @initial_millis = 0
     @paused = false
     @loading_index = 0
+    @server_timer = 0.0
     load_loading_properties
-    @timer = 0.0
   end
 
   def needs_cursor?
@@ -44,11 +43,11 @@ class Racers < Gosu::Window
   def draw_when_loading
     return unless @loading
     @shade_image.draw(0, 0, 4)
-    @loading_font.draw_rot($window_width / 2, $window_heigth / 2, 5, 0.0)
+    @loading_font.draw_rot(@centre_pos.x, @centre_pos.y, 5, 0.0)
+    sleep(0.5)
     if @loading_index < @countdown.size
       handle_countdown unless @paused
     else
-      @initial_millis = Gosu.milliseconds
       @loading = false
       @running = true
     end
@@ -57,7 +56,6 @@ class Racers < Gosu::Window
   def handle_countdown
     return unless millis / 1000 > 0
     @loading_index += 1
-    @initial_millis = Gosu.milliseconds
     @loading_font = Gosu::Image.from_text(
         @countdown[@loading_index], 90, font: 'res/Play.ttf'
     )
@@ -68,7 +66,7 @@ class Racers < Gosu::Window
   end
 
   def self.create(_width, _height, server_socket, player_data)
-    game = Racers.new($window_width, $window_heigth)
+    game = Racers.new($window_width, $window_heigth,)
     game.listenThread = Thread.fork do
       begin
         game.listen
@@ -78,7 +76,7 @@ class Racers < Gosu::Window
     end
 
     game.serverSocket = server_socket
-    game.id, x, y = player_data.split(',').map(&:to_f)
+    game.id, x, y, timer = player_data.split(',').map(&:to_f)
     game.id = game.id.to_i
     game.player.setP Position.new(x, y)
     game.player.setV Position.new(0.0, 0.0)
@@ -88,16 +86,17 @@ class Racers < Gosu::Window
 
   def listen
     while (info = @serverSocket.gets.chomp.split(','))
-      x, y, angle = info[1..3].map(&:to_f)
+      x, y, angle, timer, initial_millis = info[1..5].map(&:to_f)
       @enemy.setP Position.new(x, y)
       @enemy.set_angle(angle)
-      @timer += 1
+      @server_timer = timer
+      @initial_millis = initial_millis
+      puts @server_timer
     end
   end
 
   def draw
-    case @timer
-    when 0..5
+    if @server_timer != 2
       @loading_screen.draw(0, 0, 0)
     else
       @track.draw 0, 0, 0
@@ -124,7 +123,6 @@ class Racers < Gosu::Window
     case id
     when
     Gosu::KbQ
-      @player.angle = 90
       @running = false
       @serverSocket.puts '0'
       close!
@@ -143,9 +141,7 @@ end
 
 print "Enter IP:  \n"
 ip = gets.chomp
-
 server_socket = TCPSocket.new ip.length < 7 ? '10.129.201.101' : ip, 2000
-
 info = server_socket.gets
 flag, player_data = info.split(' ')
 unless flag.eql?('error')

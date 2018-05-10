@@ -12,6 +12,7 @@ class Enemy
     @pos = Position.zero
     @image = Gosu::Image.new('res/car.png')
     @angle = 0.0
+    @timer = 0.0
   end
 
   def setP(pos)

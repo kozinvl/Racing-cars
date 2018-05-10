@@ -1,4 +1,5 @@
 require 'socket'
+require 'gosu'
 
 $window_width = 800
 $window_heigth = 800
@@ -24,13 +25,7 @@ class Client
         @x_client = info[1].to_f
         @y_client = info[2].to_f
         @angle = info[3].to_f
-        players_list[1 - @player_id].client_socket.puts "1,#{@x_client},#{@y_client},#{@angle}"
-        # elsif id == 2
-        #   x = info[1].to_f
-        #   y = info[2].to_f
-        #   vx = info[3].to_f
-        #   vy = info[4].to_f
-        #   players_list[1 - @player_id].client_socket.puts "2,#{x},#{y},#{vx},#{vy}"
+        players_list[1 - @player_id].client_socket.puts "1,#{@x_client},#{@y_client},#{@angle},#{players_list.size},#{$server_timer}"
       end
     end
     @client_socket.close
@@ -40,6 +35,7 @@ end
 
 server = TCPServer.new '10.129.201.101', 2000
 $players = []
+$server_timer = Gosu.milliseconds
 loop do
   begin
     Thread.fork(server.accept) do |client|

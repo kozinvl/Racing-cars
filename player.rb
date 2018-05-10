@@ -6,17 +6,17 @@ $rop = 20
 
 class Player
   attr_accessor :pos, :vel, :angle
-  attr_reader :l
 
   def initialize
     @centre_pos = Position.new(400, 400)
     @pos = Position.zero
     @vel = Position.zero
     @angle = 90.0
-    @buttons = { Gosu::KbA => false, Gosu::KbD => false,
-                 Gosu::KbW => false, Gosu::KbS => false }
+    @buttons = {Gosu::KbA => false, Gosu::KbD => false,
+                Gosu::KbW => false, Gosu::KbS => false}
     @image = Gosu::Image.new('res/car_b.png')
     @radius = 80
+    @circle_counter
   end
 
   def setP(pos)
@@ -44,7 +44,7 @@ class Player
 
   def collide?(thing)
     dist = Gosu.distance(@centre_pos.x, @centre_pos.y, thing.x, thing.y)
-    dist < 200
+    dist < 250
   end
 
   def check_presseds
