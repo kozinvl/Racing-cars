@@ -6,11 +6,11 @@ $window_heigth = 800
 class Client
   attr_accessor :client_socket, :player_id, :x_client, :y_client, :angle
 
-  def initialize(client, id)
+  def initialize(client, id, x_client, y_client)
     @client_socket = client
     @player_id = id
-    @x_client = rand($window_width)
-    @y_client = rand($window_heigth)
+    @x_client = x_client
+    @y_client = y_client
   end
 
   def listen(players_list)
@@ -45,7 +45,11 @@ loop do
     Thread.fork(server.accept) do |client|
       num_players = $players.size
       if num_players < 2
-        player = Client.new(client, num_players)
+        if num_players.zero?
+          player = Client.new(client, num_players, 410, 665)
+        elsif num_players == 1
+          player = Client.new(client, num_players, 410, 735)
+        end
         $players << player
         info = "connected #{player.player_id},#{player.x_client},#{player.y_client}"
         player.client_socket.puts info
