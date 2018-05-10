@@ -1,12 +1,11 @@
-﻿class Position
-  @@count = 1
+﻿
+class Position
   attr_accessor :x, :y
 
   def initialize(x, y, bool = false)
     @x = x
     @y = y
     puts to_s if bool
-    @@count += 1
   end
 
   def to_s
@@ -21,3 +20,4 @@
     Position.new(a.x + b.x, a.y + b.y)
   end
 end
+

@@ -5,6 +5,9 @@ require_relative 'position'
 require_relative 'player'
 require_relative 'passive_objects'
 
+module ZOrder
+  BACKGROUND, ENEMY, PLAYER, COVER, UI = *0..5
+end
 
 class Racers < Gosu::Window
   attr_accessor :listenThread, :serverSocket, :id, :player, :enemy, :running
@@ -27,6 +30,7 @@ class Racers < Gosu::Window
     @paused = false
     @loading_index = 0
     @server_timer = 0.0
+    @score_label = 'Score'
     load_loading_properties
   end
 
@@ -42,8 +46,8 @@ class Racers < Gosu::Window
 
   def draw_when_loading
     return unless @loading
-    @shade_image.draw(0, 0, 4)
-    @loading_font.draw_rot(@centre_pos.x, @centre_pos.y, 5, 0.0)
+    @shade_image.draw(0, 0, ZOrder::COVER)
+    @loading_font.draw_rot(@centre_pos.x, @centre_pos.y, ZOrder::UI, 0.0)
     sleep(0.5)
     if @loading_index < @countdown.size
       handle_countdown unless @paused
@@ -78,36 +82,39 @@ class Racers < Gosu::Window
     game.serverSocket = server_socket
     game.id, x, y, timer = player_data.split(',').map(&:to_f)
     game.id = game.id.to_i
-    game.player.setP Position.new(x, y)
-    game.player.setV Position.new(0.0, 0.0)
-    game.enemy.setP Position.new(-1000, -1000)
+    game.player.set_position Position.new(x, y)
+    game.player.set_velocity Position.new(0.0, 0.0)
+    game.enemy.set_position Position.new(-1000, -1000)
     game
   end
 
   def listen
     while (info = @serverSocket.gets.chomp.split(','))
       x, y, angle, timer, initial_millis = info[1..5].map(&:to_f)
-      @enemy.setP Position.new(x, y)
+      @enemy.set_position Position.new(x, y)
       @enemy.set_angle(angle)
       @server_timer = timer
       @initial_millis = initial_millis
-      puts @server_timer
     end
   end
 
   def draw
     if @server_timer != 2
-      @loading_screen.draw(0, 0, 0)
+      @loading_screen.draw(0, 0, ZOrder::UI)
     else
-      @track.draw 0, 0, 0
+      @track.draw 0, 0, ZOrder::BACKGROUND
       @player.draw
       @enemy.draw
       draw_when_loading
+      @font.draw("#{@score_label}: #{@counter}", 10, 10,
+                 ZOrder::UI, 1.0, 1.0, 0xff_f5f5f5)
     end
   end
 
+
   def update
-    if @finish && @running
+    @counter = @player.circle_counter
+    if @player.circle_counter >= 100 && @running
       @running = false
       @serverSocket.puts '0'
     end
@@ -116,7 +123,7 @@ class Racers < Gosu::Window
   end
 
   def send_me
-    @serverSocket.puts "1,#{@player.pos.x},#{@player.pos.y},#{@player.angle}"
+    @serverSocket.puts "1,#{@player.player_position.x},#{@player.player_position.y},#{@player.angle}"
   end
 
   def button_down(id)
@@ -139,7 +146,7 @@ class Racers < Gosu::Window
   end
 end
 
-print "Enter IP:  \n"
+puts "Enter IP:  \n"
 ip = gets.chomp
 server_socket = TCPSocket.new ip.length < 7 ? '10.129.201.101' : ip, 2000
 info = server_socket.gets

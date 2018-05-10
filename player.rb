@@ -5,46 +5,50 @@ $window_heigth = 800
 $rop = 20
 
 class Player
-  attr_accessor :pos, :vel, :angle
+  attr_accessor :player_position, :vel, :angle, :circle_counter
 
   def initialize
-    @centre_pos = Position.new(400, 400)
-    @pos = Position.zero
+    @centre_position = Position.new(400, 400)
+    @finish_position = Position.new(410, 700)
+    @player_position = Position.zero
     @vel = Position.zero
     @angle = 90.0
     @buttons = {Gosu::KbA => false, Gosu::KbD => false,
                 Gosu::KbW => false, Gosu::KbS => false}
     @image = Gosu::Image.new('res/car_b.png')
     @radius = 80
-    @circle_counter
+    @circle_counter = 0
   end
 
-  def setP(pos)
-    @pos = pos
+  def set_position(pos)
+    @player_position = pos
   end
 
-  def setV(vel)
+  def set_velocity(vel)
     @vel = vel
   end
 
   def draw
-    @image.draw_rot(@pos.x, @pos.y, 1, @angle)
+    @image.draw_rot(@player_position.x, @player_position.y, ZOrder::PLAYER, @angle)
   end
 
   def update
-    @pos = Position.add(@pos, @vel)
-    @pos.x = [[@pos.x, $window_width - 1].min, 0].max
-    @pos.y = [[@pos.y, $window_heigth - 1].min, 0].max
-    if collide?(@pos)
+    @player_position = Position.add(@player_position, @vel)
+    @player_position.x = [[@player_position.x, $window_width - 1].min, 0].max
+    @player_position.y = [[@player_position.y, $window_heigth - 1].min, 0].max
+    if collide?(@centre_position, @player_position, @radius * 3)
       @vel.x = 0
       @vel.y = 0
+    end
+    if collide?(@finish_position, @player_position, @radius / 2)
+      @circle_counter += 1
     end
     check_presseds
   end
 
-  def collide?(thing)
-    dist = Gosu.distance(@centre_pos.x, @centre_pos.y, thing.x, thing.y)
-    dist < 250
+  def collide?(object_a, object_b, radius)
+    distance = Gosu.distance(object_a.x, object_a.y, object_b.x, object_b.y)
+    distance < radius
   end
 
   def check_presseds
@@ -59,7 +63,6 @@ class Player
     if @buttons[Gosu::KbS]
       @vel.x = 0.0
       @vel.y = 0.0
-
     end
   end
 

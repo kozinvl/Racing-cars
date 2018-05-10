@@ -25,7 +25,8 @@ class Client
         @x_client = info[1].to_f
         @y_client = info[2].to_f
         @angle = info[3].to_f
-        players_list[1 - @player_id].client_socket.puts "1,#{@x_client},#{@y_client},#{@angle},#{players_list.size},#{$server_timer}"
+        string_clients = "1,#{@x_client},#{@y_client},#{@angle},#{players_list.size},#{$server_timer}"
+        players_list[1 - @player_id].client_socket.puts string_clients
       end
     end
     @client_socket.close
@@ -41,9 +42,10 @@ loop do
     Thread.fork(server.accept) do |client|
       num_players = $players.size
       if num_players < 2
-        if num_players.zero?
+        case num_players
+        when 0
           player = Client.new(client, num_players, 410, 665)
-        elsif num_players == 1
+        when 1
           player = Client.new(client, num_players, 410, 735)
         end
         $players << player
