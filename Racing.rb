@@ -12,7 +12,9 @@ class Racers < Gosu::Window
   def initialize(width, height)
     super(width, height, false)
     self.caption = 'Racing'
+    @centre_pos = Position.new(400, 400)
     @track = Gosu::Image.new('res/track.jpg', tileable: true)
+    @loading_screen = Gosu::Image.new('res/loading_screen.jpg', tileable: true)
     @shade_image = Gosu::Image.new('res/shade.png', tileable: true)
     @player = Player.new
     @enemy = Enemy.new
@@ -96,7 +98,7 @@ class Racers < Gosu::Window
   def draw
     case @timer
     when 0..5
-      @track.draw 0, 0, 0
+      @loading_screen.draw(0, 0, 0)
     else
       @track.draw 0, 0, 0
       @player.draw
