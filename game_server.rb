@@ -12,6 +12,7 @@ class Client
     @player_id = id
     @x_client = x_client
     @y_client = y_client
+    @score = 0
   end
 
   def listen(players_list)
@@ -25,7 +26,7 @@ class Client
         @x_client = info[1].to_f
         @y_client = info[2].to_f
         @angle = info[3].to_f
-        string_clients = "1,#{@x_client},#{@y_client},#{@angle},#{players_list.size},#{$server_timer}"
+        string_clients = "1,#{@x_client},#{@y_client},#{@angle},#{players_list.size},#{$server_timer},#{@score}"
         players_list[1 - @player_id].client_socket.puts string_clients
       end
     end

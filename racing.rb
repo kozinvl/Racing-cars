@@ -29,8 +29,9 @@ class Racers < Gosu::Window
     @countdown = ['3', '2', '1', 'GO!']
     @paused = false
     @loading_index = 0
+    @number_of_players = 0.0
+    @timer_label = 'Timer'
     @server_timer = 0.0
-    @score_label = 'Score'
     load_loading_properties
   end
 
@@ -66,7 +67,7 @@ class Racers < Gosu::Window
   end
 
   def millis
-    Gosu.milliseconds - @initial_millis
+    Gosu.milliseconds - @server_timer
   end
 
   def self.create(_width, _height, server_socket, player_data)
@@ -90,35 +91,55 @@ class Racers < Gosu::Window
 
   def listen
     while (info = @serverSocket.gets.chomp.split(','))
-      x, y, angle, timer, initial_millis = info[1..5].map(&:to_f)
+      x, y, angle, players, initial_millis, score = info[1..6].map(&:to_f)
       @enemy.set_position Position.new(x, y)
       @enemy.set_angle(angle)
-      @server_timer = timer
-      @initial_millis = initial_millis
+      @enemy.set_score(score)
+      @number_of_players = players
+      @server_timer = initial_millis
     end
   end
 
   def draw
-    if @server_timer != 2
+    if @number_of_players != 2
       @loading_screen.draw(0, 0, ZOrder::UI)
+    elsif @finish
+      if @enemy.score > @player.score
+        @loading_screen.draw(0, 0, ZOrder::UI)
+        @loading_font = Gosu::Image.from_text("You lose", 90, font: 'res/Play.ttf'
+        )
+        @loading_font.draw(0, 0, ZOrder::UI)
+      elsif @enemy.score < @player.score
+        @loading_screen.draw(0, 0, ZOrder::UI)
+        @loading_font = Gosu::Image.from_text("You win", 90, font: 'res/Play.ttf'
+        )
+        @loading_font.draw(0, 0, ZOrder::UI)
+      elsif @enemy.score == @player.score
+        @loading_screen.draw(0, 0, ZOrder::UI)
+        @loading_font = Gosu::Image.from_text("Draw", 90, font: 'res/Play.ttf'
+        )
+        @loading_font.draw(0, 0, ZOrder::UI)
+      end
     else
       @track.draw 0, 0, ZOrder::BACKGROUND
       @player.draw
       @enemy.draw
       draw_when_loading
-      @font.draw("#{@score_label}: #{@counter}", 10, 10,
+      @font.draw("#{@timer_label}: #{millis / 1000}", 10, 10,
                  ZOrder::UI, 1.0, 1.0, 0xff_f5f5f5)
     end
+
   end
 
 
   def update
-    @counter = @player.circle_counter
-    if @player.circle_counter >= 100 && @running
+    @counter = @player.score
+    if millis / 1000 >= 30 && @running
       @running = false
+      @finish = true
       @serverSocket.puts '0'
     end
-    @player.update if running
+    @player.update if @running
     send_me
   end
 

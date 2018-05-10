@@ -5,7 +5,7 @@ $window_width = 800
 $window_heigth = 800
 
 class Enemy
-  attr_accessor :position, :angle, :circle_counter
+  attr_accessor :position, :angle, :circle_counter, :score
 
   def initialize
     @position = Position.zero
@@ -19,6 +19,10 @@ class Enemy
 
   def set_angle(angle)
     @angle = angle
+  end
+
+  def set_score(score)
+    @score = score
   end
 
   def draw

@@ -5,7 +5,7 @@ $window_heigth = 800
 $rop = 20
 
 class Player
-  attr_accessor :player_position, :vel, :angle, :circle_counter
+  attr_accessor :player_position, :vel, :angle, :score
 
   def initialize
     @centre_position = Position.new(400, 400)
@@ -17,7 +17,7 @@ class Player
                 Gosu::KbW => false, Gosu::KbS => false}
     @image = Gosu::Image.new('res/car_b.png')
     @radius = 80
-    @circle_counter = 0
+    @score = 0
   end
 
   def set_position(pos)
@@ -41,9 +41,9 @@ class Player
       @vel.y = 0
     end
     if collide?(@finish_position, @player_position, @radius / 2)
-      @circle_counter += 1
+      @score += 1
     end
-    check_presseds
+    check_pressed
   end
 
   def collide?(object_a, object_b, radius)
@@ -51,7 +51,7 @@ class Player
     distance < radius
   end
 
-  def check_presseds
+  def check_pressed
     @angle -= 4.5 if @buttons[Gosu::KbA]
     @angle += 4.5 if @buttons[Gosu::KbD]
     if @buttons[Gosu::KbW]
