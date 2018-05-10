@@ -4,13 +4,13 @@ $window_width = 800
 $window_heigth = 800
 
 class Client
-  attr_accessor :client_socket, :player_id, :x, :y, :angle
+  attr_accessor :client_socket, :player_id, :x_client, :y_client, :angle
 
   def initialize(client, id)
     @client_socket = client
     @player_id = id
-    @x = rand($window_width)
-    @y = rand($window_heigth)
+    @x_client = rand($window_width)
+    @y_client = rand($window_heigth)
   end
 
   def listen(players_list)
@@ -21,10 +21,10 @@ class Client
       if (id == 0) && !$players.empty?
         $players = []
       elsif id == 1
-        @x = info[1].to_f
-        @y = info[2].to_f
+        @x_client = info[1].to_f
+        @y_client = info[2].to_f
         @angle = info[3].to_f
-        players_list[1 - @player_id].client_socket.puts "1,#{@x},#{@y},#{@angle}"
+        players_list[1 - @player_id].client_socket.puts "1,#{@x_client},#{@y_client},#{@angle}"
         # elsif id == 2
         #   x = info[1].to_f
         #   y = info[2].to_f
@@ -47,7 +47,7 @@ loop do
       if num_players < 2
         player = Client.new(client, num_players)
         $players << player
-        info = "connected #{player.player_id},#{player.x},#{player.y}"
+        info = "connected #{player.player_id},#{player.x_client},#{player.y_client}"
         player.client_socket.puts info
         player.listen($players)
         puts $players
