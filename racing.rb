@@ -125,7 +125,7 @@ class Racers < Gosu::Window
   end
 
   def update
-    if !(0...10).cover?(@player.score) or !(0...10).cover?(@enemy.score) && @running
+    if !(0...10).cover?(@player.score) || !(0...10).cover?(@enemy.score) && @running
       @running = false
       @finish = true
       @serverSocket.puts '0'
