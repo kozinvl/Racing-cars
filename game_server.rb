@@ -3,11 +3,15 @@ require 'gosu'
 
 $window_width = 800
 $window_heigth = 800
+=begin
+ File to create server, accept clients and info exchange.
+=end
 
 class Client
   attr_accessor :client_socket, :player_id, :x_client, :y_client, :angle, :score
 
   def initialize(client, id, x_client, y_client)
+    #initializing client and position
     @client_socket = client
     @player_id = id
     @x_client = x_client
@@ -16,6 +20,7 @@ class Client
   end
 
   def listen(players_list)
+    #listening each clients and pushing arguments for them
     loop do
       next unless players_list.size == 2
       info = @client_socket.gets.chomp.split(',')
@@ -36,23 +41,26 @@ class Client
         end
       end
     end
-    # @client_socket.close
   end
 end
-
+#creating server
 server = TCPServer.new '10.129.201.101', 2000
+#creating clients array
 $players = []
+#Server's time
 $server_timer = Gosu.milliseconds
+
 loop do
   begin
+    #server is waiting clients and initialize instances for them
     Thread.new(server.accept) do |client|
       num_players = $players.size
       if num_players < 2
         case num_players
-        when 0 then
-          player = Client.new(client, num_players, 410, 665)
-        when 1 then
-          player = Client.new(client, num_players, 410, 735)
+          when 0 then
+            player = Client.new(client, num_players, 410, 665)
+          when 1 then
+            player = Client.new(client, num_players, 410, 735)
         end
         $players << player
         info = "connected #{player.player_id},#{player.x_client},#{player.y_client}"
