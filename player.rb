@@ -40,7 +40,7 @@ class Player
       @vel.x = 0
       @vel.y = 0
     end
-    if collide?(@finish_position, @player_position, @radius / 2)
+    if collide?(@finish_position, @player_position, @radius / 4)
       @score += 1
     end
     check_pressed

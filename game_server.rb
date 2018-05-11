@@ -5,7 +5,7 @@ $window_width = 800
 $window_heigth = 800
 
 class Client
-  attr_accessor :client_socket, :player_id, :x_client, :y_client, :angle
+  attr_accessor :client_socket, :player_id, :x_client, :y_client, :angle, :score
 
   def initialize(client, id, x_client, y_client)
     @client_socket = client
@@ -26,7 +26,8 @@ class Client
         @x_client = info[1].to_f
         @y_client = info[2].to_f
         @angle = info[3].to_f
-        string_clients = "1,#{@x_client},#{@y_client},#{@angle},#{players_list.size},#{$server_timer},#{@score}"
+        @score = info[4].to_f
+        string_clients = "1,#{@x_client},#{@y_client},#{@angle},#{@score},#{players_list.size},#{$server_timer}"
         players_list[1 - @player_id].client_socket.puts string_clients
       end
     end
