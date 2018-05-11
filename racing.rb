@@ -16,32 +16,32 @@ class Racers < Gosu::Window
     super(width, height, false)
     self.caption = 'Racing'
     @centre_pos = Position.new($window_width / 2, $window_heigth / 2)
-    @track = Gosu::Image.new('res/track.jpg', tileable: true)
-    @loading_screen = Gosu::Image.new('res/loading_screen.jpg', tileable: true)
-    @shade_image = Gosu::Image.new('res/shade.png', tileable: true)
     @player = Player.new
     @enemy = Enemy.new
     @running = false
     @finish = false
-    @font = Gosu::Font.new(self, 'Arial', 24)
     @loading = true
-    @countdown = ['3', '2', '1', 'GO!']
     @paused = false
     @loading_index = 0
     @number_of_players = 0
     @timer_label = 'Timer'
     @start_time = 0.0
-    load_loading_properties
+    load_properties
+  end
+
+  def load_properties
+    @track = Gosu::Image.new('res/track.jpg', tileable: true)
+    @loading_screen = Gosu::Image.new('res/loading_screen.jpg', tileable: true)
+    @shade_image = Gosu::Image.new('res/shade.png', tileable: true)
+    @font = Gosu::Font.new(self, 'Arial', 24)
+    @countdown = %w[3 2 1 GO!]
+    @loading_font = Gosu::Image.from_text(
+      @countdown[@loading_index], 90, font: 'res/Play.ttf'
+    )
   end
 
   def needs_cursor?
     true
-  end
-
-  def load_loading_properties
-    @loading_font = Gosu::Image.from_text(
-        @countdown[@loading_index], 90, font: 'res/Play.ttf'
-    )
   end
 
   def draw_when_loading
@@ -61,7 +61,7 @@ class Racers < Gosu::Window
     return unless millis / 1000 > 0
     @loading_index += 1
     @loading_font = Gosu::Image.from_text(
-        @countdown[@loading_index], 90, font: 'res/Play.ttf'
+      @countdown[@loading_index], 90, font: 'res/Play.ttf'
     )
   end
 

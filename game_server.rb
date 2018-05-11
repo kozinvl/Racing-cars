@@ -28,20 +28,24 @@ class Client
         @angle = info[3].to_f
         @score = info[4].to_f
         string_clients = "1,#{@x_client},#{@y_client},#{@angle},#{@score},#{players_list.size},#{$server_timer}"
-        players_list[1 - @player_id].client_socket.puts string_clients
+        begin
+          players_list[1 - @player_id].client_socket.puts string_clients
+        rescue Errno::EPIPE
+          STDERR.puts 'Connection broke!'
+          @client_socket.close
+        end
       end
     end
-    @client_socket.close
+    # @client_socket.close
   end
 end
-
 
 server = TCPServer.new '10.129.201.101', 2000
 $players = []
 $server_timer = Gosu.milliseconds
 loop do
   begin
-    Thread.fork(server.accept) do |client|
+    Thread.new(server.accept) do |client|
       num_players = $players.size
       if num_players < 2
         case num_players
@@ -57,9 +61,9 @@ loop do
       else
         puts 'error full number of players'
         client.close
+      end
     end
-    end
-  rescue Interrupt
+  rescue StandardError
     puts 'Connection closed'
   end
-  end
+end
