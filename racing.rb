@@ -15,29 +15,35 @@ class Racers < Gosu::Window
   def initialize(width, height)
     super(width, height, false)
     self.caption = 'Racing'
-    @centre_pos = Position.new($window_width / 2, $window_heigth / 2)
     @player = Player.new
     @enemy = Enemy.new
+    @centre_pos = Position.new($window_width / 2, $window_heigth / 2)
+    load_properties
+    load_resources
+  end
+
+  def load_properties
     @running = false
     @finish = false
     @loading = true
     @paused = false
     @loading_index = 0
     @number_of_players = 0
-    @timer_label = 'Timer'
+    @score_label = 'Score'
     @start_time = 0.0
-    load_properties
   end
 
-  def load_properties
+  def load_resources
     @track = Gosu::Image.new('res/track.jpg', tileable: true)
     @loading_screen = Gosu::Image.new('res/loading_screen.jpg', tileable: true)
     @shade_image = Gosu::Image.new('res/shade.png', tileable: true)
     @font = Gosu::Font.new(self, 'Arial', 24)
+    @game_font = 'res/Play.ttf'
     @countdown = %w[3 2 1 GO!]
     @loading_font = Gosu::Image.from_text(
-      @countdown[@loading_index], 90, font: 'res/Play.ttf'
+        @countdown[@loading_index], 90, font: 'res/Play.ttf'
     )
+    @endings = ['You lose', 'You win']
   end
 
   def needs_cursor?
@@ -61,7 +67,7 @@ class Racers < Gosu::Window
     return unless millis / 1000 > 0
     @loading_index += 1
     @loading_font = Gosu::Image.from_text(
-      @countdown[@loading_index], 90, font: 'res/Play.ttf'
+        @countdown[@loading_index], 90, font: 'res/Play.ttf'
     )
   end
 
@@ -78,7 +84,6 @@ class Racers < Gosu::Window
         puts 'connection closed'
       end
     end
-
     game.serverSocket = server_socket
     game.id, x, y = player_data.split(',').map(&:to_f)
     game.id = game.id.to_i
@@ -107,26 +112,27 @@ class Racers < Gosu::Window
       @player.draw
       @enemy.draw
       draw_when_loading
-      @font.draw("#{@timer_label}: #{@player.score}", 10, 10,
+      @font.draw("#{@score_label}: #{@player.score}", 10, 10,
                  ZOrder::UI, 1.0, 1.0, 0xff_f5f5f5)
     end
-    if @finish
-      @loading_screen.draw(0, 0, ZOrder::UI)
-      if @enemy.score > @player.score
-        @loading_font = Gosu::Image.from_text('You lose', 90, font: 'res/Play.ttf')
-      elsif @enemy.score < @player.score
-        @loading_font = Gosu::Image.from_text('You win', 90, font: 'res/Play.ttf')
-      elsif @enemy.score == @player.score
-        @loading_font = Gosu::Image.from_text('Draw', 90, font: 'res/Play.ttf')
-      end
-      @loading_font.draw(0, 0, ZOrder::UI)
+    show_finish_screen if @finish
+  end
 
+  def show_finish_screen
+    @loading_screen.draw(0, 0, ZOrder::UI)
+    if @enemy.score > @player.score
+      @loading_font = Gosu::Image.from_text(@endings[0], 90, font: @game_font)
+    elsif @enemy.score < @player.score
+      @loading_font = Gosu::Image.from_text(@endings[1], 90, font: @game_font)
+    elsif @enemy.score == @player.score
+      @loading_font = Gosu::Image.from_text(@endings[2], 90, font: @game_font)
     end
+    @loading_font.draw(0, 0, ZOrder::UI)
   end
 
   def update
     if !(0...10).cover?(@player.score) || !(0...10).cover?(@enemy.score) && @running
-      @running = false
+      close
       @finish = true
       @serverSocket.puts '0'
     end
@@ -135,7 +141,8 @@ class Racers < Gosu::Window
   end
 
   def send_me
-    @serverSocket.puts "1,#{@player.player_position.x},#{@player.player_position.y},#{@player.angle},#{@player.score}"
+    @serverSocket.puts "1,#{@player.player_position.x},#{
+    @player.player_position.y},#{@player.angle},#{@player.score}"
   end
 
   def button_down(id)

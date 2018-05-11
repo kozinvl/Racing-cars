@@ -13,8 +13,8 @@ class Player
     @player_position = Position.zero
     @vel = Position.zero
     @angle = 90.0
-    @buttons = {Gosu::KbA => false, Gosu::KbD => false,
-                Gosu::KbW => false, Gosu::KbS => false}
+    @buttons = { Gosu::KbA => false, Gosu::KbD => false,
+                 Gosu::KbW => false, Gosu::KbS => false }
     @image = Gosu::Image.new('res/car_b.png')
     @radius = 80
     @score = 0
@@ -40,9 +40,7 @@ class Player
       @vel.x = 0
       @vel.y = 0
     end
-    if collide?(@finish_position, @player_position, @radius / 4)
-      @score += 1
-    end
+    @score += 1 if collide?(@finish_position, @player_position, @radius / 4)
     check_pressed
   end
 
