@@ -45,22 +45,21 @@ loop do
       num_players = $players.size
       if num_players < 2
         case num_players
-        when 0
+        when 0 then
           player = Client.new(client, num_players, 410, 665)
-        when 1
+        when 1 then
           player = Client.new(client, num_players, 410, 735)
         end
         $players << player
         info = "connected #{player.player_id},#{player.x_client},#{player.y_client}"
         player.client_socket.puts info
         player.listen($players)
-        puts $players
       else
         puts 'error full number of players'
         client.close
-      end
+    end
     end
   rescue Interrupt
     puts 'Connection closed'
   end
-end
+  end
