@@ -160,9 +160,14 @@ end
 
 puts "Enter IP:  \n"
 ip = gets.chomp
-server_socket = TCPSocket.new ip.length < 7 ? '10.129.201.101' : ip, 2000
+server_socket = TCPSocket.new ip.length < 7 ? '10.129.201.101' : ip, 4000
 info = server_socket.gets
-flag, player_data = info.split(' ')
+begin
+  flag, player_data = info.split(' ')
+rescue StandardError
+  puts 'Limit is exceeded'
+  exit
+end
 unless flag.eql?('error')
   game = Racers.create($window_width, $window_heigth, server_socket, player_data)
   game.show
