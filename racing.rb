@@ -10,9 +10,16 @@ module ZOrder
 end
 
 class Racers < Gosu::Window
+=begin
+  class describes the creation of the application interface and client logic
+and the interaction of objects in the application
+=end
   attr_accessor :listenThread, :serverSocket, :id, :player, :enemy, :running
 
   def initialize(width, height)
+=begin
+    To minimize the constructor, variables are separated and put into methods
+=end
     super(width, height, false)
     self.caption = 'Racing'
     @player = Player.new
@@ -23,6 +30,7 @@ class Racers < Gosu::Window
   end
 
   def load_properties
+    #initializing variables
     @running = false
     @finish = false
     @loading = true
@@ -34,6 +42,7 @@ class Racers < Gosu::Window
   end
 
   def load_resources
+    #initializing variables
     @track = Gosu::Image.new('res/track.jpg', tileable: true)
     @loading_screen = Gosu::Image.new('res/loading_screen.jpg', tileable: true)
     @shade_image = Gosu::Image.new('res/shade.png', tileable: true)
@@ -47,10 +56,12 @@ class Racers < Gosu::Window
   end
 
   def needs_cursor?
+    #show cursor
     true
   end
 
   def draw_when_loading
+    #when both players are connected, the countdown for the start will start
     return unless @loading
     @shade_image.draw(0, 0, ZOrder::COVER)
     @loading_font.draw_rot(@centre_pos.x, @centre_pos.y, ZOrder::UI, 0.0)
@@ -64,6 +75,7 @@ class Racers < Gosu::Window
   end
 
   def handle_countdown
+    #Preparing a picture from the text for the counter
     return unless millis / 1000 > 0
     @loading_index += 1
     @loading_font = Gosu::Image.from_text(
@@ -72,6 +84,7 @@ class Racers < Gosu::Window
   end
 
   def millis
+    #time since the connection
     Gosu.milliseconds - @start_time
   end
 
@@ -94,6 +107,7 @@ class Racers < Gosu::Window
   end
 
   def listen
+    #listen to the socket
     while (info = @serverSocket.gets.chomp.split(','))
       x, y, angle, score, players, initial_millis = info[1..6].map(&:to_f)
       @enemy.set_position Position.new(x, y)
@@ -105,6 +119,7 @@ class Racers < Gosu::Window
   end
 
   def draw
+    #The method of rendering all that is in the area of the created window
     if @number_of_players != 2
       @loading_screen.draw(0, 0, ZOrder::UI)
     else
@@ -119,6 +134,7 @@ class Racers < Gosu::Window
   end
 
   def show_finish_screen
+    #shows the ending depending on the results of the game
     @loading_screen.draw(0, 0, ZOrder::UI)
     if @enemy.score > @player.score
       @loading_font = Gosu::Image.from_text(@endings[0], 90, font: @game_font)
@@ -131,6 +147,7 @@ class Racers < Gosu::Window
   end
 
   def update
+    #method of updating the area of rendering and game processes
     if !(0...10).cover?(@player.score) || !(0...10).cover?(@enemy.score) && @running
       close
       @finish = true
@@ -141,26 +158,30 @@ class Racers < Gosu::Window
   end
 
   def send_me
+    #send data to the socket from this client
     @serverSocket.puts "1,#{@player.player_position.x},#{
     @player.player_position.y},#{@player.angle},#{@player.score}"
   end
 
   def button_down(id)
+    #interception of keystrokes
     case id
-    when
-    Gosu::KbQ
-      @running = false
-      @serverSocket.puts '0'
-      close!
+      when
+      Gosu::KbQ
+        @running = false
+        @serverSocket.puts '0'
+        close!
     end
     @player.button_down(id)
   end
 
   def button_up(id)
+    #interception of the completion of keystrokes
     @player.button_up(id)
   end
 
   def close
+    #flow stop
     !@running
   end
 end

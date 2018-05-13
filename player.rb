@@ -5,6 +5,7 @@ $window_heigth = 800
 $rop = 20
 
 class Player
+  #player class description
   attr_accessor :player_position, :vel, :angle, :score
 
   def initialize
@@ -29,10 +30,12 @@ class Player
   end
 
   def draw
+    #The method of rendering all that is in the area of the created window
     @image.draw_rot(@player_position.x, @player_position.y, ZOrder::PLAYER, @angle)
   end
 
   def update
+    #method of updating the area of rendering and game processes
     @player_position = Position.add(@player_position, @vel)
     @player_position.x = [[@player_position.x, $window_width - 1].min, 0].max
     @player_position.y = [[@player_position.y, $window_heigth - 1].min, 0].max
@@ -45,11 +48,13 @@ class Player
   end
 
   def collide?(object_a, object_b, radius)
+    #check collisions of object_a and object_b with radius
     distance = Gosu.distance(object_a.x, object_a.y, object_b.x, object_b.y)
     distance < radius
   end
 
   def check_pressed
+    #listen to keystrokes and perform actions
     @angle -= 4.5 if @buttons[Gosu::KbA]
     @angle += 4.5 if @buttons[Gosu::KbD]
     if @buttons[Gosu::KbW]
@@ -65,10 +70,12 @@ class Player
   end
 
   def button_down(id)
+    #interception of keystrokes
     @buttons[id] = true
   end
 
   def button_up(id)
+    #interception of the completion of keystrokes
     @buttons[id] = false
   end
 end
