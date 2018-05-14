@@ -44,7 +44,7 @@ class Client
   end
 end
 #creating server
-server = TCPServer.new 'localhost', 2000
+server = TCPServer.new '10.129.201.101', 2000
 #creating clients array
 $players = []
 #Server's time
