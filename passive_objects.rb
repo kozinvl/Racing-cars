@@ -14,8 +14,8 @@ class Enemy
     @score = 0.0
   end
 
-  def set_position(pos)
-    @pos = pos
+  def set_position(position)
+    @position = position
   end
 
   def set_angle(angle)
@@ -27,6 +27,6 @@ class Enemy
   end
 
   def draw
-    @image.draw_rot(@pos.x, @pos.y, ZOrder::PLAYER, @angle)
+    @image.draw_rot(@position.x, @position.y, ZOrder::PLAYER, @angle)
   end
 end

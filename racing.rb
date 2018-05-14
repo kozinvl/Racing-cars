@@ -10,16 +10,12 @@ module ZOrder
 end
 
 class Racers < Gosu::Window
-=begin
-  class describes the creation of the application interface and client logic
-and the interaction of objects in the application
-=end
+  #   class describes the creation of the application interface and client logic
+  # and the interaction of objects in the application
   attr_accessor :listenThread, :serverSocket, :id, :player, :enemy, :running
 
   def initialize(width, height)
-=begin
-    To minimize the constructor, variables are separated and put into methods
-=end
+    #     To minimize the constructor, variables are separated and put into methods
     super(width, height, false)
     self.caption = 'Racing'
     @player = Player.new
@@ -30,7 +26,7 @@ and the interaction of objects in the application
   end
 
   def load_properties
-    #initializing variables
+    # initializing variables
     @running = false
     @finish = false
     @loading = true
@@ -42,7 +38,7 @@ and the interaction of objects in the application
   end
 
   def load_resources
-    #initializing variables
+    # initializing variables
     @track = Gosu::Image.new('res/track.jpg', tileable: true)
     @loading_screen = Gosu::Image.new('res/loading_screen.jpg', tileable: true)
     @shade_image = Gosu::Image.new('res/shade.png', tileable: true)
@@ -50,18 +46,18 @@ and the interaction of objects in the application
     @game_font = 'res/Play.ttf'
     @countdown = %w[3 2 1 GO!]
     @loading_font = Gosu::Image.from_text(
-        @countdown[@loading_index], 90, font: 'res/Play.ttf'
+      @countdown[@loading_index], 90, font: 'res/Play.ttf'
     )
     @endings = ['You lose', 'You win']
   end
 
   def needs_cursor?
-    #show cursor
+    # show cursor
     true
   end
 
   def draw_when_loading
-    #when both players are connected, the countdown for the start will start
+    # when both players are connected, the countdown for the start will start
     return unless @loading
     @shade_image.draw(0, 0, ZOrder::COVER)
     @loading_font.draw_rot(@centre_pos.x, @centre_pos.y, ZOrder::UI, 0.0)
@@ -75,16 +71,16 @@ and the interaction of objects in the application
   end
 
   def handle_countdown
-    #Preparing a picture from the text for the counter
+    # Preparing a picture from the text for the counter
     return unless millis / 1000 > 0
     @loading_index += 1
     @loading_font = Gosu::Image.from_text(
-        @countdown[@loading_index], 90, font: 'res/Play.ttf'
+      @countdown[@loading_index], 90, font: 'res/Play.ttf'
     )
   end
 
   def millis
-    #time since the connection
+    # time since the connection
     Gosu.milliseconds - @start_time
   end
 
@@ -107,7 +103,7 @@ and the interaction of objects in the application
   end
 
   def listen
-    #listen to the socket
+    # listen to the socket
     while (info = @serverSocket.gets.chomp.split(','))
       x, y, angle, score, players, initial_millis = info[1..6].map(&:to_f)
       @enemy.set_position Position.new(x, y)
@@ -119,7 +115,7 @@ and the interaction of objects in the application
   end
 
   def draw
-    #The method of rendering all that is in the area of the created window
+    # The method of rendering all that is in the area of the created window
     if @number_of_players != 2
       @loading_screen.draw(0, 0, ZOrder::UI)
     else
@@ -134,7 +130,7 @@ and the interaction of objects in the application
   end
 
   def show_finish_screen
-    #shows the ending depending on the results of the game
+    # shows the ending depending on the results of the game
     @loading_screen.draw(0, 0, ZOrder::UI)
     if @enemy.score > @player.score
       @loading_font = Gosu::Image.from_text(@endings[0], 90, font: @game_font)
@@ -147,7 +143,7 @@ and the interaction of objects in the application
   end
 
   def update
-    #method of updating the area of rendering and game processes
+    # method of updating the area of rendering and game processes
     if !(0...10).cover?(@player.score) || !(0...10).cover?(@enemy.score) && @running
       close
       @finish = true
@@ -158,30 +154,29 @@ and the interaction of objects in the application
   end
 
   def send_me
-    #send data to the socket from this client
-    @serverSocket.puts "1,#{@player.player_position.x},#{
-    @player.player_position.y},#{@player.angle},#{@player.score}"
+    # send data to the socket from this client
+    @serverSocket.puts "1,#{@player.player_position.x},#{@player.player_position.y},#{@player.angle},#{@player.score}"
   end
 
   def button_down(id)
-    #interception of keystrokes
+    # interception of keystrokes
     case id
-      when
+    when
       Gosu::KbQ
-        @running = false
-        @serverSocket.puts '0'
-        close!
+      @running = false
+      @serverSocket.puts '0'
+      close!
     end
     @player.button_down(id)
   end
 
   def button_up(id)
-    #interception of the completion of keystrokes
+    # interception of the completion of keystrokes
     @player.button_up(id)
   end
 
   def close
-    #flow stop
+    # flow stop
     !@running
   end
 end
