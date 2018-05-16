@@ -21,22 +21,26 @@ class Client
     # listening each clients and pushing arguments for them
     loop do
       next unless players_list.size == 2
-      info = @client_socket.gets.chomp.split(',')
-      id = info[0].to_i
-      if (id == 0) && !$players.empty?
-        $players = []
-      elsif id == 1
-        @x_client = info[1].to_f
-        @y_client = info[2].to_f
-        @angle = info[3].to_f
-        @score = info[4].to_f
-        string_clients = "1,#{@x_client},#{@y_client},#{@angle},#{@score},#{players_list.size},#{$server_timer}"
-        begin
+      begin
+        info = @client_socket.gets.chomp.split(',')
+        id = info[0].to_i
+        if (id == 0) && !$players.empty?
+          $players = []
+        elsif id == 1
+          @x_client = info[1].to_f
+          @y_client = info[2].to_f
+          @angle = info[3].to_f
+          @score = info[4].to_f
+          string_clients = "1,#{@x_client},#{@y_client},#{@angle},#{@score},#{players_list.size},#{$server_timer}"
           players_list[1 - @player_id].client_socket.puts string_clients
-        rescue Errno::EPIPE
-          STDERR.puts 'Connection broke!'
-          @client_socket.close
         end
+      rescue NoMethodError
+        puts 'NoMethodError'
+        @client_socket.close
+      rescue IOError
+        puts 'IOError'
+        Thread.stop
+        @client_socket.close
       end
     end
   end

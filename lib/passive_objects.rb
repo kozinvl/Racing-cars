@@ -5,7 +5,7 @@ $window_width = 800
 $window_heigth = 800
 
 class Enemy
-  attr_accessor :position, :angle, :circle_counter, :score
+  attr_accessor :position, :angle, :score
 
   def initialize
     @position = Position.zero

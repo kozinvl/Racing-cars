@@ -46,7 +46,7 @@ class Racers < Gosu::Window
     @game_font = 'res/Play.ttf'
     @countdown = %w[3 2 1 GO!]
     @loading_font = Gosu::Image.from_text(
-      @countdown[@loading_index], 90, font: 'res/Play.ttf'
+        @countdown[@loading_index], 90, font: 'res/Play.ttf'
     )
     @endings = ['You lose', 'You win']
   end
@@ -75,7 +75,7 @@ class Racers < Gosu::Window
     return unless millis / 1000 > 0
     @loading_index += 1
     @loading_font = Gosu::Image.from_text(
-      @countdown[@loading_index], 90, font: 'res/Play.ttf'
+        @countdown[@loading_index], 90, font: 'res/Play.ttf'
     )
   end
 
@@ -86,7 +86,7 @@ class Racers < Gosu::Window
 
   def self.create(_width, _height, server_socket, player_data)
     game = Racers.new($window_width, $window_heigth)
-    game.listenThread = Thread.fork do
+    game.listenThread = Thread.new do
       begin
         game.listen
       rescue IOError
@@ -104,13 +104,19 @@ class Racers < Gosu::Window
 
   def listen
     # listen to the socket
-    while (info = @serverSocket.gets.chomp.split(','))
-      x, y, angle, score, players, initial_millis = info[1..6].map(&:to_f)
-      @enemy.set_position Position.new(x, y)
-      @enemy.set_angle(angle)
-      @enemy.set_score(score)
-      @number_of_players = players
-      @start_time = initial_millis
+    begin
+      while (info = @serverSocket.gets.chomp.split(','))
+        x, y, angle, score, players, initial_millis = info[1..6].map(&:to_f)
+        @enemy.set_position Position.new(x, y)
+        @enemy.set_angle(angle)
+        @enemy.set_score(score)
+        @number_of_players = players
+        @start_time = initial_millis
+      end
+    rescue NoMethodError
+      puts 'No method'
+    rescue Errno::EPIPE
+      STDERR.puts 'Connection broke!'
     end
   end
 
@@ -162,7 +168,7 @@ class Racers < Gosu::Window
     # interception of keystrokes
     case id
     when
-      Gosu::KbQ
+    Gosu::KbQ
       @running = false
       @serverSocket.puts '0'
       close!
