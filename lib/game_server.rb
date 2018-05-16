@@ -5,8 +5,8 @@ $window_width = 800
 $window_heigth = 800
 LOCALHOST='localhost'
 NETHOST='10.129.201.101'
-#  File to create server, accept clients and info exchange.
 
+#  File to create server, accept clients and info exchange.
 class Client
   attr_accessor :client_socket, :player_id, :x_client, :y_client, :angle, :score
 
