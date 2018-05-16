@@ -5,6 +5,9 @@ require_relative 'position'
 require_relative 'player'
 require_relative 'passive_objects'
 
+LOCALHOST='localhost'
+NETHOST='10.129.201.101'
+
 module ZOrder
   BACKGROUND, ENEMY, PLAYER, COVER, UI = *0..5
 end
@@ -189,7 +192,7 @@ end
 
 puts "Enter IP:  \n"
 ip = gets.chomp
-server_socket = TCPSocket.new ip.length < 7 ? '10.129.201.101' : ip, 2000
+server_socket = TCPSocket.new ip.length < 7 ? LOCALHOST : ip, 2000
 info = server_socket.gets
 begin
   flag, player_data = info.split(' ')
