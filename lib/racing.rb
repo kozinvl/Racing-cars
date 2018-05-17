@@ -5,8 +5,8 @@ require_relative 'position'
 require_relative 'player'
 require_relative 'passive_objects'
 
-LOCALHOST='localhost'
-NETHOST='10.129.201.101'
+LOCALHOST = 'localhost'
+NETHOST = '10.129.201.101'
 
 module ZOrder
   BACKGROUND, ENEMY, PLAYER, COVER, UI = *0..5
@@ -45,6 +45,8 @@ class Racers < Gosu::Window
     @track = Gosu::Image.new('res/track.jpg', tileable: true)
     @loading_screen = Gosu::Image.new('res/loading_screen.jpg', tileable: true)
     @shade_image = Gosu::Image.new('res/shade.png', tileable: true)
+    @win_image = Gosu::Image.new('res/victory.jpg', tileable: true)
+    @lose_image = Gosu::Image.new('res/lose.jpg', tileable: true)
     @font = Gosu::Font.new(self, 'Arial', 24)
     @game_font = 'res/Play.ttf'
     @countdown = %w[3 2 1 GO!]
@@ -135,20 +137,19 @@ class Racers < Gosu::Window
       @font.draw("#{@score_label}: #{@player.score}", 10, 10,
                  ZOrder::UI, 1.0, 1.0, 0xff_f5f5f5)
     end
-    show_finish_screen if @finish
+    show_finish_screen.draw(0, 0, ZOrder::UI) if @finish
   end
 
   def show_finish_screen
     # shows the ending depending on the results of the game
-    @loading_screen.draw(0, 0, ZOrder::UI)
     if @enemy.score > @player.score
-      @loading_font = Gosu::Image.from_text(@endings[0], 90, font: @game_font)
+      @finish_screen = @lose_image
     elsif @enemy.score < @player.score
-      @loading_font = Gosu::Image.from_text(@endings[1], 90, font: @game_font)
+      @finish_screen = @win_image
     elsif @enemy.score == @player.score
-      @loading_font = Gosu::Image.from_text(@endings[2], 90, font: @game_font)
+      @finish_screen = Gosu::Image.from_text(@endings[2], 90, font: @game_font)
     end
-    @loading_font.draw(0, 0, ZOrder::UI)
+    @finish_screen
   end
 
   def update
@@ -159,12 +160,12 @@ class Racers < Gosu::Window
       @serverSocket.puts '0'
     end
     @player.update if @running
-    send_me
+    @serverSocket.puts send_data
   end
 
-  def send_me
+  def send_data
     # send data to the socket from this client
-    @serverSocket.puts "1,#{@player.player_position.x},#{@player.player_position.y},#{@player.angle},#{@player.score}"
+    "1,#{@player.player_position.x},#{@player.player_position.y},#{@player.angle},#{@player.score}"
   end
 
   def button_down(id)
@@ -192,7 +193,7 @@ end
 
 puts "Enter IP:  \n"
 ip = gets.chomp
-server_socket = TCPSocket.new ip.length < 7 ? LOCALHOST : ip, 2000
+server_socket = TCPSocket.new ip.length < 7 ? NETHOST : ip, 2000
 info = server_socket.gets
 begin
   flag, player_data = info.split(' ')
