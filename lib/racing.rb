@@ -5,8 +5,8 @@ require_relative 'position'
 require_relative 'player'
 require_relative 'passive_objects'
 
-LOCALHOST = 'localhost'
-NETHOST = '10.129.201.101'
+LOCALHOST = 'localhost'.freeze
+NETHOST = '10.129.201.101'.freeze
 
 module ZOrder
   BACKGROUND, ENEMY, PLAYER, COVER, UI = *0..5
@@ -89,9 +89,9 @@ class Racers < Gosu::Window
     Gosu.milliseconds - @start_time
   end
 
-  def self.create(_width, _height, server_socket, player_data)
-    game = Racers.new($window_width, $window_heigth)
-    game.listenThread = Thread.new do
+  def self.create(width, height, server_socket, player_data)
+    game = Racers.new(width, height)
+    game.listenThread = Thread.fork do
       begin
         game.listen
       rescue IOError
@@ -109,20 +109,19 @@ class Racers < Gosu::Window
 
   def listen
     # listen to the socket
-    begin
-      while (info = @serverSocket.gets.chomp.split(','))
-        x, y, angle, score, players, initial_millis = info[1..6].map(&:to_f)
-        @enemy.set_position Position.new(x, y)
-        @enemy.set_angle(angle)
-        @enemy.set_score(score)
-        @number_of_players = players
-        @start_time = initial_millis
-      end
-    rescue NoMethodError
-      puts 'No method'
-    rescue Errno::EPIPE
-      STDERR.puts 'Connection broke!'
+
+    while (info = @serverSocket.gets.chomp.split(','))
+      x, y, angle, score, players, initial_millis = info[1..6].map(&:to_f)
+      @enemy.set_position Position.new(x, y)
+      @enemy.set_angle(angle)
+      @enemy.set_score(score)
+      @number_of_players = players
+      @start_time = initial_millis
     end
+  rescue NoMethodError
+    puts 'No method'
+  rescue Errno::EPIPE
+    STDERR.puts 'Connection broke!'
   end
 
   def draw
@@ -171,8 +170,7 @@ class Racers < Gosu::Window
   def button_down(id)
     # interception of keystrokes
     case id
-    when
-    Gosu::KbQ
+    when Gosu::KbQ
       @running = false
       @serverSocket.puts '0'
       close!

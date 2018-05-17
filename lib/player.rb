@@ -1,4 +1,6 @@
 require_relative 'position'
+require 'gosu'
+
 
 $window_width = 800
 $window_heigth = 800
