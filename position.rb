@@ -1,11 +1,9 @@
-﻿
-class Position
+﻿class Position
   attr_accessor :x, :y
 
-  def initialize(x, y, bool = false)
+  def initialize(x, y)
     @x = x
     @y = y
-    puts to_s if bool
   end
 
   def to_s
