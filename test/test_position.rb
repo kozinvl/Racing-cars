@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require 'gosu'
-load 'lib/player.rb'
-load 'lib/position.rb'
+load 'player.rb'
+load 'position.rb'
 
 TEST_X = 10
 TEST_Y = 1
