@@ -1,7 +1,6 @@
 require_relative 'position'
 require 'gosu'
 
-
 $window_width = 800
 $window_heigth = 800
 $rop = 20
@@ -21,6 +20,7 @@ class Player
     @image = Gosu::Image.new('res/car_b.png')
     @radius = 80
     @score = 0
+    @reverse_moving = false
   end
 
   def set_position(pos)
@@ -41,17 +41,14 @@ class Player
     @player_position = Position.add(@player_position, @velocity)
     @player_position.x = [[@player_position.x, $window_width - 1].min, 0].max
     @player_position.y = [[@player_position.y, $window_heigth - 1].min, 0].max
-    if collide?(@centre_position, @player_position, @radius * 3)
-      @velocity.x = 0
-      @velocity.y = 0
-    end
-    @score += 1 if collide?(@finish_position, @player_position, @radius * 1.5)
+    @velocity = Position.zero
+    @score += 1 if collide?(@finish_position, @radius * 1.5)
     check_pressed
   end
 
-  def collide?(object_a, object_b, radius)
+  def collide?(object_a, radius = @radius)
     # check collisions of object_a and object_b with radius
-    distance = Gosu.distance(object_a.x, object_a.y, object_b.x, object_b.y)
+    distance = Gosu.distance(object_a.x, object_a.y, player_position.x, player_position.y)
     distance < radius
   end
 
@@ -59,15 +56,18 @@ class Player
     # listen to keystrokes and perform actions
     @angle -= 4.5 if @buttons[Gosu::KbA]
     @angle += 4.5 if @buttons[Gosu::KbD]
-    if @buttons[Gosu::KbW]
-      @velocity.x += Gosu.offset_x(@angle, 0.5)
-      @velocity.y += Gosu.offset_y(@angle, 0.5)
-      @velocity.x *= 0.9
-      @velocity.y *= 0.9
-    end
-    if @buttons[Gosu::KbS]
-      @velocity.x = 0.0
-      @velocity.y = 0.0
+    @velocity = detour if @buttons[Gosu::KbW]
+    @velocity = Position.zero if @buttons[Gosu::KbS]
+  end
+
+  def detour
+    # makes impossible running throw fountain in the centre of screen
+    if collide?(@centre_position, @radius * 3)
+      Position.new(
+          -Gosu.offset_x(@angle, 10), -Gosu.offset_y(@angle, 10)
+      )
+    else
+      Position.new(Gosu.offset_x(@angle, 5), Gosu.offset_y(@angle, 5))
     end
   end
 

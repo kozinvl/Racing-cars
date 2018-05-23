@@ -141,14 +141,13 @@ class Racers < Gosu::Window
 
   def show_finish_screen
     # shows the ending depending on the results of the game
-    if @enemy.score > @player.score
-      @finish_screen = @lose_image
-    elsif @enemy.score < @player.score
-      @finish_screen = @win_image
-    elsif @enemy.score == @player.score
-      @finish_screen = Gosu::Image.from_text(@endings[2], 90, font: @game_font)
-    end
-    @finish_screen
+    @finish_screen = if @enemy.score > @player.score
+                       @lose_image
+                     elsif @enemy.score < @player.score
+                       @win_image
+                     else
+                       Gosu::Image.from_text(@endings[2], 90, font: @game_font)
+                     end
   end
 
   def update
@@ -164,7 +163,8 @@ class Racers < Gosu::Window
 
   def send_data
     # send data to the socket from this client
-    "1,#{@player.player_position.x},#{@player.player_position.y},#{@player.angle},#{@player.score}"
+    "1,#{@player.player_position.x},#{@player.player_position.y},#{
+    @player.angle},#{@player.score}"
   end
 
   def button_down(id)
@@ -189,9 +189,7 @@ class Racers < Gosu::Window
   end
 end
 
-puts "Enter IP:  \n"
-ip = gets.chomp
-server_socket = TCPSocket.new ip.length < 7 ? NETHOST : ip, 2000
+server_socket = TCPSocket.new NETHOST, 2000
 info = server_socket.gets
 begin
   flag, player_data = info.split(' ')
