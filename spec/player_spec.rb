@@ -24,7 +24,7 @@ describe Player do
   it 'should be truthy in collide func' do
     @player_one.set_position(@position)
     @player_two.set_position(@position)
-    collide_result = @player_one.collide?(@first_player_pos, @second_player_pos, 100)
+    collide_result = @player_one.collide?(@second_player_pos, 100)
     expect(collide_result).to be_truthy
   end
 
