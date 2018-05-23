@@ -30,15 +30,13 @@ class TestPlayer < Minitest::Test
   def test_collision
     @player_one.set_position(@position)
     @player_two.set_position(@position)
-    assert_equal(@player_one.collide?(
-        @player_one.player_position, @player_two.player_position, TEST_RADIUS),
+    assert_equal(@player_one.collide?( @player_two.player_position, TEST_RADIUS),
                  true)
   end
 
   def test_collision_first_player
     @player_one.set_position(@position)
-    assert_equal(@player_one.collide?(
-        @player_one.player_position, @position, TEST_RADIUS),
+    assert_equal(@player_one.collide?( @position, TEST_RADIUS),
                  true)
   end
 

@@ -3,7 +3,6 @@ require 'gosu'
 
 $window_width = 800
 $window_heigth = 800
-$rop = 20
 
 class Player
   # player class description
