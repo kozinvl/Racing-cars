@@ -4,20 +4,24 @@ require_relative '../position'
 
 describe Position do
 
-  it 'should be equal in initialize' do
-    position = Position.new(10, 1)
-    expect(position.x).to eq 10
+  before :each do
+    @position = Position.new(10, 1)
+  end
+
+  it 'should be equal x var in initialize' do
+    expect(@position.x).to eq 10
+  end
+
+  it 'should be equal y var in initialize' do
+    expect(@position.y).to eq 1
   end
 
   it 'should be instance of class' do
-    position = Position.new(1, 1)
-    expect(position).to be_an_instance_of Position
+    expect(@position).to be_an_instance_of Position
   end
 
-  it 'should not be' do
-    position = Position.new 10, 10.to_s
-    expect(position).not_to eq Position.new 10, 10.to_s
+  it 'should not be equal instances' do
+    expect(@position).not_to eq Position.new 10, 10
   end
-
 
 end
