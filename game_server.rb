@@ -4,7 +4,7 @@ require 'gosu'
 $window_width = 800
 $window_heigth = 800
 LOCALHOST = 'localhost'
-NETHOST = '10.129.201.101'
+NET_HOST = '10.129.201.101'
 
 #  File to create server, accept clients and info exchange.
 class Client
@@ -48,7 +48,7 @@ class Client
   end
 end
 # creating server
-server = TCPServer.new NETHOST, 2000
+server = TCPServer.new NET_HOST, 2000
 # creating clients array
 $players = []
 # Server's time

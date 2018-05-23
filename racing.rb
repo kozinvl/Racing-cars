@@ -6,7 +6,7 @@ require_relative 'player'
 require_relative 'passive_objects'
 
 LOCALHOST = 'localhost'.freeze
-NETHOST = '10.129.201.101'.freeze
+NET_HOST = '10.129.201.101'.freeze
 
 module ZOrder
   BACKGROUND, ENEMY, PLAYER, COVER, UI = *0..5
@@ -189,7 +189,7 @@ class Racers < Gosu::Window
   end
 end
 
-server_socket = TCPSocket.new NETHOST, 2000
+server_socket = TCPSocket.new NET_HOST, 2000
 info = server_socket.gets
 begin
   flag, player_data = info.split(' ')
