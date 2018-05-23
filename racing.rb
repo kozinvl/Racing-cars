@@ -56,6 +56,24 @@ class Racers < Gosu::Window
     @endings = ['You lose', 'You win']
   end
 
+  def self.create(width, height, server_socket, player_data)
+    game = Racers.new(width, height)
+    game.listenThread = Thread.fork do
+      begin
+        game.listen
+      rescue IOError
+        puts 'connection closed'
+      end
+    end
+    game.serverSocket = server_socket
+    game.id, x, y = player_data.split(',').map(&:to_f)
+    game.id = game.id.to_i
+    game.player.set_position Position.new(x, y)
+    game.player.set_velocity Position.new(0.0, 0.0)
+    game.enemy.set_position Position.new(-1000, -1000)
+    game
+  end
+
   def needs_cursor?
     # show cursor
     true
@@ -87,24 +105,6 @@ class Racers < Gosu::Window
   def millis
     # time since the connection
     Gosu.milliseconds - @start_time
-  end
-
-  def self.create(width, height, server_socket, player_data)
-    game = Racers.new(width, height)
-    game.listenThread = Thread.fork do
-      begin
-        game.listen
-      rescue IOError
-        puts 'connection closed'
-      end
-    end
-    game.serverSocket = server_socket
-    game.id, x, y = player_data.split(',').map(&:to_f)
-    game.id = game.id.to_i
-    game.player.set_position Position.new(x, y)
-    game.player.set_velocity Position.new(0.0, 0.0)
-    game.enemy.set_position Position.new(-1000, -1000)
-    game
   end
 
   def listen
