@@ -3,8 +3,8 @@ require 'gosu'
 
 $window_width = 800
 $window_heigth = 800
-LOCALHOST='localhost'
-NETHOST='10.129.201.101'
+LOCALHOST = 'localhost'
+NETHOST = '10.129.201.101'
 
 #  File to create server, accept clients and info exchange.
 class Client
@@ -61,10 +61,10 @@ loop do
       num_players = $players.size
       if num_players < 2
         case num_players
-          when 0 then
-            player = Client.new(client, num_players, 410, 665)
-          when 1 then
-            player = Client.new(client, num_players, 410, 735)
+        when 0 then
+          player = Client.new(client, num_players, 410, 665)
+        when 1 then
+          player = Client.new(client, num_players, 410, 735)
         end
         $players << player
         info = "connected #{player.player_id},#{player.x_client},#{player.y_client}"
