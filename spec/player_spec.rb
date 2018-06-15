@@ -12,7 +12,7 @@ describe Player do
     @second_player_pos = @player_two.player_position
   end
 
-  it 'should do change position to player' do
+  it 'should change position to player' do
     @player_one.set_position(@position)
     expect(@position).to eq @player_one.player_position
   end
@@ -28,37 +28,47 @@ describe Player do
     expect(collide_result).to be_truthy
   end
 
-  it 'should change cars angle after clicking button A' do
-    @player_one.button_down(Gosu::KbA)
-    @player_one.check_pressed
-    angle_result = @player_one.angle
-    expect(angle_result).to eq 85.5
+  context 'when clicking A button' do
+    it 'changes cars angle' do
+      @player_one.button_down(Gosu::KbA)
+      @player_one.check_pressed
+      angle_result = @player_one.angle
+      expect(angle_result).to eq 85.5
+    end
   end
 
-  it 'should change cars angle after clicking button D' do
-    @player_one.button_down(Gosu::KbD)
-    @player_one.check_pressed
-    angle_result = @player_one.angle
-    expect(angle_result).to eq 94.5
+  context 'when clicking D button' do
+    it 'changes cars angle' do
+      @player_one.button_down(Gosu::KbD)
+      @player_one.check_pressed
+      angle_result = @player_one.angle
+      expect(angle_result).to eq 94.5
+    end
   end
 
-  it 'should change cars velocity after clicking button S' do
-    @player_one.button_down(Gosu::KbS)
-    @player_one.check_pressed
-    velocity_result_x = @player_one.velocity.x
-    velocity_result_y = @player_one.velocity.y
-    expect(velocity_result_x).to eq 0.0
-    expect(velocity_result_y).to eq 0.0
+  context 'when clicking S button' do
+    it 'changes cars velocity' do
+      @player_one.button_down(Gosu::KbS)
+      @player_one.check_pressed
+      velocity_result_x = @player_one.velocity.x
+      velocity_result_y = @player_one.velocity.y
+      expect(velocity_result_x).to eq 0.0
+      expect(velocity_result_y).to eq 0.0
+    end
   end
 
-  it 'should return false after clicking S' do
-    result = @player_one.button_up Gosu::KbS
-    expect(result).to be_falsey
+  context 'when clicking S button' do
+    it 'returns false' do
+      result = @player_one.button_up Gosu::KbS
+      expect(result).to be_falsey
+    end
   end
 
-  it 'should return true after clicking W' do
-    result = @player_one.button_down Gosu::KbW
-    expect(result).to be_truthy
+  context 'when clicking W button' do
+    it 'returns true' do
+      result = @player_one.button_down Gosu::KbW
+      expect(result).to be_truthy
+    end
   end
 
 end
