@@ -51,9 +51,8 @@ class Racers < Gosu::Window
     @game_font = 'res/Play.ttf'
     @countdown = %w[3 2 1 GO!]
     @loading_font = Gosu::Image.from_text(
-        @countdown[@loading_index], 90, font: @game_font
+      @countdown[@loading_index], 90, font: @game_font
     )
-    @endings = ['You lose', 'You win']
   end
 
   def self.create(width, height, server_socket, player_data)
@@ -98,7 +97,7 @@ class Racers < Gosu::Window
     return unless millis / 1000 > 0
     @loading_index += 1
     @loading_font = Gosu::Image.from_text(
-        @countdown[@loading_index], 90, font: 'res/Play.ttf'
+      @countdown[@loading_index], 90, font: 'res/Play.ttf'
     )
   end
 
@@ -120,8 +119,6 @@ class Racers < Gosu::Window
     end
   rescue NoMethodError
     puts 'No method'
-  rescue Errno::EPIPE
-    STDERR.puts 'Connection broke!'
   end
 
   def draw
@@ -143,12 +140,10 @@ class Racers < Gosu::Window
     # shows the ending depending on the results of the game
     @player.score.freeze
     @enemy.score.freeze
-    @finish_screen = if @enemy.score > @player.score
-                       @lose_image
-                     elsif @enemy.score < @player.score
+    @finish_screen = if @enemy.score < @player.score
                        @win_image
                      else
-                       Gosu::Image.from_text(@endings[2], 90, font: @game_font)
+                       @lose_image
                      end
   end
 
