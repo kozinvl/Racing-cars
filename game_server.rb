@@ -3,8 +3,7 @@ require 'gosu'
 
 $window_width = 800
 $window_heigth = 800
-LOCALHOST = 'localhost'
-NET_HOST = '10.129.201.101'
+
 
 #  File to create server, accept clients and info exchange.
 class Client
@@ -38,17 +37,16 @@ class Client
         end
       rescue NoMethodError
         puts 'NoMethodError'
-        @client_socket.close
+        break
       rescue IOError
         puts 'IOError'
-        Thread.stop
         @client_socket.close
       end
     end
   end
 end
 # creating server
-server = TCPServer.new NET_HOST, 2000
+server = TCPServer.new NET_HOST, 3000
 # creating clients array
 $players = []
 # Server's time
@@ -57,7 +55,7 @@ $server_timer = Gosu.milliseconds
 loop do
   begin
     # server is waiting clients and initialize instances for them
-    Thread.new(server.accept) do |client|
+    Thread.start(server.accept) do |client|
       num_players = $players.size
       if num_players < 2
         case num_players
@@ -69,13 +67,18 @@ loop do
         $players << player
         info = "connected #{player.player_id},#{player.x_client},#{player.y_client}"
         player.client_socket.puts info
-        player.listen($players)
+        begin
+          player.listen($players)
+        rescue Errno::EPIPE
+        end
       else
         puts 'error full number of players'
         client.close
+        server.freeze
       end
     end
   rescue StandardError
-    puts 'Connection closed'
+    break
+    # puts 'Connection closed'
   end
 end

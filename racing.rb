@@ -141,6 +141,8 @@ class Racers < Gosu::Window
 
   def show_finish_screen
     # shows the ending depending on the results of the game
+    @player.score.freeze
+    @enemy.score.freeze
     @finish_screen = if @enemy.score > @player.score
                        @lose_image
                      elsif @enemy.score < @player.score
@@ -189,7 +191,7 @@ class Racers < Gosu::Window
   end
 end
 
-server_socket = TCPSocket.new NET_HOST, 2000
+server_socket = TCPSocket.new NET_HOST, 3000
 info = server_socket.gets
 begin
   flag, player_data = info.split(' ')
