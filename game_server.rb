@@ -74,6 +74,7 @@ loop do
         end
       else
         puts 'error full number of players'
+        # server.close
         client.close
         server.freeze
       end
