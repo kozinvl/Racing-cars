@@ -1,12 +1,12 @@
 require 'rubygems'
 require 'gosu'
 require 'socket'
+require 'bundler'
 require_relative 'position'
 require_relative 'player'
 require_relative 'passive_objects'
+require_relative 'res/data'
 
-LOCALHOST = 'localhost'.freeze
-NET_HOST = '10.129.201.101'.freeze
 
 module ZOrder
   BACKGROUND, ENEMY, PLAYER, COVER, UI = *0..5
@@ -20,7 +20,7 @@ class Racers < Gosu::Window
   def initialize(width, height)
     #     To minimize the constructor, variables are separated and put into methods
     super(width, height, false)
-    self.caption = 'Racing'
+    self.caption = WINDOW[:title]
     @player = Player.new
     @enemy = Enemy.new
     @centre_pos = Position.new($window_width / 2, $window_heigth / 2)
@@ -191,7 +191,7 @@ class Racers < Gosu::Window
   end
 end
 
-server_socket = TCPSocket.new NET_HOST, 3000
+server_socket = TCPSocket.new NET_HOST, NET_PORT
 info = server_socket.gets
 begin
   flag, player_data = info.split(' ')

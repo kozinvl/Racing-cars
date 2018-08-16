@@ -1,5 +1,6 @@
 require 'socket'
 require 'gosu'
+require_relative 'res/data'
 
 $window_width = 800
 $window_heigth = 800
@@ -46,7 +47,7 @@ class Client
   end
 end
 # creating server
-server = TCPServer.new NET_HOST, 3000
+server = TCPServer.new NET_HOST, NET_PORT
 # creating clients array
 $players = []
 # Server's time
