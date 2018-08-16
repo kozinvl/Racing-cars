@@ -6,7 +6,7 @@ require_relative 'position'
 require_relative 'player'
 require_relative 'passive_objects'
 require_relative 'res/data'
-
+require_relative 'res/caching_resources'
 
 module ZOrder
   BACKGROUND, ENEMY, PLAYER, COVER, UI = *0..5
@@ -23,7 +23,8 @@ class Racers < Gosu::Window
     self.caption = WINDOW[:title]
     @player = Player.new
     @enemy = Enemy.new
-    @centre_pos = Position.new($window_width / 2, $window_heigth / 2)
+    @centre_pos = Position.new(WINDOW[:middle], WINDOW[:middle])
+    @font = Gosu::Font.new(self, 'Arial', 24)
     load_properties
     load_resources
   end
@@ -42,16 +43,15 @@ class Racers < Gosu::Window
 
   def load_resources
     # initializing variables
-    @track = Gosu::Image.new('res/track.jpg', tileable: true)
-    @loading_screen = Gosu::Image.new('res/loading_screen.jpg', tileable: true)
-    @shade_image = Gosu::Image.new('res/shade.png', tileable: true)
-    @win_image = Gosu::Image.new('res/victory.jpg', tileable: true)
-    @lose_image = Gosu::Image.new('res/lose.jpg', tileable: true)
-    @font = Gosu::Font.new(self, 'Arial', 24)
+    @track = IMAGES[:track]
+    @loading_screen = IMAGES[:loading_screen]
+    @shade_image = IMAGES[:shade_image]
+    @win_image = IMAGES[:win_image]
+    @lose_image = IMAGES[:lose_image]
     @game_font = 'res/Play.ttf'
     @countdown = %w[3 2 1 GO!]
     @loading_font = Gosu::Image.from_text(
-        @countdown[@loading_index], 90, font: 'res/Play.ttf'
+        @countdown[@loading_index], 90, font: @game_font
     )
     @endings = ['You lose', 'You win']
   end
@@ -69,8 +69,8 @@ class Racers < Gosu::Window
     game.id, x, y = player_data.split(',').map(&:to_f)
     game.id = game.id.to_i
     game.player.set_position Position.new(x, y)
-    game.player.set_velocity Position.new(0.0, 0.0)
-    game.enemy.set_position Position.new(-1000, -1000)
+    # game.player.set_velocity Position.new(0.0, 0.0)
+    # game.enemy.set_position Position.new(-1000, -1000)
     game
   end
 
@@ -165,8 +165,7 @@ class Racers < Gosu::Window
 
   def send_data
     # send data to the socket from this client
-    "1,#{@player.player_position.x},#{@player.player_position.y},#{
-    @player.angle},#{@player.score}"
+    "1,#{@player.player_position.x},#{@player.player_position.y},#{@player.angle},#{@player.score}"
   end
 
   def button_down(id)
