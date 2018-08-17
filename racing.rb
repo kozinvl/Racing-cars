@@ -51,7 +51,7 @@ class Racers < Gosu::Window
     @game_font = 'res/Play.ttf'
     @countdown = %w[3 2 1 GO!]
     @loading_font = Gosu::Image.from_text(
-      @countdown[@loading_index], 90, font: @game_font
+        @countdown[@loading_index], 90, font: @game_font
     )
   end
 
@@ -68,8 +68,6 @@ class Racers < Gosu::Window
     game.id, x, y = player_data.split(',').map(&:to_f)
     game.id = game.id.to_i
     game.player.set_position Position.new(x, y)
-    # game.player.set_velocity Position.new(0.0, 0.0)
-    # game.enemy.set_position Position.new(-1000, -1000)
     game
   end
 
@@ -97,7 +95,7 @@ class Racers < Gosu::Window
     return unless millis / 1000 > 0
     @loading_index += 1
     @loading_font = Gosu::Image.from_text(
-      @countdown[@loading_index], 90, font: 'res/Play.ttf'
+        @countdown[@loading_index], 90, font: 'res/Play.ttf'
     )
   end
 
@@ -194,7 +192,7 @@ rescue StandardError
   exit
 end
 unless flag.eql?('error')
-  game = Racers.create($window_width, $window_heigth, server_socket, player_data)
+  game = Racers.create(WINDOW[:width], WINDOW[:height], server_socket, player_data)
   game.show
 end
 server_socket.close
