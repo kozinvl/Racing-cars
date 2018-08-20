@@ -1,12 +1,12 @@
 require 'rubygems'
 require 'gosu'
 require 'socket'
+require 'bundler'
 require_relative 'position'
 require_relative 'player'
 require_relative 'passive_objects'
-
-LOCALHOST = 'localhost'.freeze
-NET_HOST = '10.129.201.101'.freeze
+require_relative 'res/data'
+require_relative 'res/caching_resources'
 
 module ZOrder
   BACKGROUND, ENEMY, PLAYER, COVER, UI = *0..5
@@ -20,10 +20,11 @@ class Racers < Gosu::Window
   def initialize(width, height)
     #     To minimize the constructor, variables are separated and put into methods
     super(width, height, false)
-    self.caption = 'Racing'
+    self.caption = WINDOW[:title]
     @player = Player.new
     @enemy = Enemy.new
-    @centre_pos = Position.new($window_width / 2, $window_heigth / 2)
+    @centre_pos = Position.new(WINDOW[:middle], WINDOW[:middle])
+    @font = Gosu::Font.new(self, 'Arial', 24)
     load_properties
     load_resources
   end
@@ -42,18 +43,16 @@ class Racers < Gosu::Window
 
   def load_resources
     # initializing variables
-    @track = Gosu::Image.new('res/track.jpg', tileable: true)
-    @loading_screen = Gosu::Image.new('res/loading_screen.jpg', tileable: true)
-    @shade_image = Gosu::Image.new('res/shade.png', tileable: true)
-    @win_image = Gosu::Image.new('res/victory.jpg', tileable: true)
-    @lose_image = Gosu::Image.new('res/lose.jpg', tileable: true)
-    @font = Gosu::Font.new(self, 'Arial', 24)
+    @track = IMAGES[:track]
+    @loading_screen = IMAGES[:loading_screen]
+    @shade_image = IMAGES[:shade_image]
+    @win_image = IMAGES[:win_image]
+    @lose_image = IMAGES[:lose_image]
     @game_font = 'res/Play.ttf'
     @countdown = %w[3 2 1 GO!]
     @loading_font = Gosu::Image.from_text(
-        @countdown[@loading_index], 90, font: 'res/Play.ttf'
+        @countdown[@loading_index], 90, font: @game_font
     )
-    @endings = ['You lose', 'You win']
   end
 
   def self.create(width, height, server_socket, player_data)
@@ -69,8 +68,6 @@ class Racers < Gosu::Window
     game.id, x, y = player_data.split(',').map(&:to_f)
     game.id = game.id.to_i
     game.player.set_position Position.new(x, y)
-    game.player.set_velocity Position.new(0.0, 0.0)
-    game.enemy.set_position Position.new(-1000, -1000)
     game
   end
 
@@ -120,8 +117,6 @@ class Racers < Gosu::Window
     end
   rescue NoMethodError
     puts 'No method'
-  rescue Errno::EPIPE
-    STDERR.puts 'Connection broke!'
   end
 
   def draw
@@ -141,12 +136,12 @@ class Racers < Gosu::Window
 
   def show_finish_screen
     # shows the ending depending on the results of the game
-    @finish_screen = if @enemy.score > @player.score
-                       @lose_image
-                     elsif @enemy.score < @player.score
+    @player.score.freeze
+    @enemy.score.freeze
+    @finish_screen = if @enemy.score < @player.score
                        @win_image
                      else
-                       Gosu::Image.from_text(@endings[2], 90, font: @game_font)
+                       @lose_image
                      end
   end
 
@@ -163,8 +158,7 @@ class Racers < Gosu::Window
 
   def send_data
     # send data to the socket from this client
-    "1,#{@player.player_position.x},#{@player.player_position.y},#{
-    @player.angle},#{@player.score}"
+    "1,#{@player.player_position.x},#{@player.player_position.y},#{@player.angle},#{@player.score}"
   end
 
   def button_down(id)
@@ -189,7 +183,7 @@ class Racers < Gosu::Window
   end
 end
 
-server_socket = TCPSocket.new NET_HOST, 2000
+server_socket = TCPSocket.new NET_HOST, NET_PORT
 info = server_socket.gets
 begin
   flag, player_data = info.split(' ')
@@ -198,7 +192,7 @@ rescue StandardError
   exit
 end
 unless flag.eql?('error')
-  game = Racers.create($window_width, $window_heigth, server_socket, player_data)
+  game = Racers.create(WINDOW[:width], WINDOW[:height], server_socket, player_data)
   game.show
 end
 server_socket.close

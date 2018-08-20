@@ -1,10 +1,6 @@
 require 'socket'
 require 'gosu'
-
-$window_width = 800
-$window_heigth = 800
-LOCALHOST = 'localhost'
-NET_HOST = '10.129.201.101'
+require_relative 'res/data'
 
 #  File to create server, accept clients and info exchange.
 class Client
@@ -27,7 +23,7 @@ class Client
         info = @client_socket.gets.chomp.split(',')
         id = info[0].to_i
         if (id == 0) && !$players.empty?
-          $players = []
+          # $players = []
         elsif id == 1
           @x_client = info[1].to_f
           @y_client = info[2].to_f
@@ -38,44 +34,50 @@ class Client
         end
       rescue NoMethodError
         puts 'NoMethodError'
-        @client_socket.close
+        break
       rescue IOError
         puts 'IOError'
-        Thread.stop
         @client_socket.close
       end
     end
   end
 end
 # creating server
-server = TCPServer.new NET_HOST, 2000
+server = TCPServer.new NET_HOST, NET_PORT
 # creating clients array
 $players = []
 # Server's time
 $server_timer = Gosu.milliseconds
-
 loop do
   begin
     # server is waiting clients and initialize instances for them
-    Thread.new(server.accept) do |client|
+    Thread.start(server.accept) do |client|
       num_players = $players.size
       if num_players < 2
         case num_players
         when 0 then
-          player = Client.new(client, num_players, 410, 665)
+          player = Client.new(client, num_players,
+                              PLAYER_1_POSITION.x, PLAYER_1_POSITION.y)
         when 1 then
-          player = Client.new(client, num_players, 410, 735)
+          player = Client.new(client, num_players,
+                              PLAYER_2_POSITION.x, PLAYER_2_POSITION.y)
         end
         $players << player
         info = "connected #{player.player_id},#{player.x_client},#{player.y_client}"
         player.client_socket.puts info
-        player.listen($players)
+        puts info
+        begin
+          player.listen($players)
+        rescue server.close
+        end
       else
         puts 'error full number of players'
+        # server.close
         client.close
       end
     end
   rescue StandardError
-    puts 'Connection closed'
+    break
+    # puts 'Connection closed'
   end
 end
